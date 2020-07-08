@@ -1,0 +1,271 @@
+---
+- description: 
+  buttons: submit,cancel
+  label: Copy of Copy of clone_service
+  dialog_tabs:
+  - description: 
+    display: 
+    label: service_clone
+    display_method: 
+    display_method_options: 
+    position: 0
+    dialog_groups:
+    - description: 
+      display: 
+      label: service_clone
+      display_method: 
+      display_method_options: 
+      position: 0
+      dialog_fields:
+      - name: service_name
+        description: ''
+        type: DialogFieldTextBox
+        data_type: string
+        notes: 
+        notes_display: 
+        display: edit
+        display_method: 
+        display_method_options: {}
+        required: true
+        required_method: 
+        required_method_options: {}
+        default_value: ''
+        values: 
+        values_method: 
+        values_method_options: {}
+        options:
+          :protected: false
+          :show_past_days: false
+          :force_multi_value: false
+        label: service_name
+        position: 0
+        validator_type: f
+        validator_rule: 
+        reconfigurable: false
+        dynamic: false
+        show_refresh_button: false
+        load_values_on_init: true
+        read_only: false
+        auto_refresh: false
+        trigger_auto_refresh: false
+        visible: true
+        refresh_fields: 
+        resource_action:
+          action: 
+          resource_type: DialogField
+          ae_namespace: 
+          ae_class: 
+          ae_instance: 
+          ae_message: 
+          ae_attributes: {}
+        dialog_field_responders: []
+      - name: src_service_id
+        description: ''
+        type: DialogFieldTextBox
+        data_type: string
+        notes: 
+        notes_display: 
+        display: edit
+        display_method: 
+        display_method_options: {}
+        required: false
+        required_method: 
+        required_method_options: {}
+        default_value: '1000000000300'
+        values: 
+        values_method: 
+        values_method_options: {}
+        options:
+          :protected: false
+          :show_past_days: false
+          :force_multi_value: false
+        label: src_service_id
+        position: 1
+        validator_type: f
+        validator_rule: 
+        reconfigurable: false
+        dynamic: false
+        show_refresh_button: false
+        load_values_on_init: true
+        read_only: false
+        auto_refresh: false
+        trigger_auto_refresh: false
+        visible: false
+        refresh_fields: 
+        resource_action:
+          action: 
+          resource_type: DialogField
+          ae_namespace: 
+          ae_class: 
+          ae_instance: 
+          ae_message: 
+          ae_attributes: {}
+        dialog_field_responders: []
+      - name: number_of_sockets
+        description: ''
+        type: DialogFieldTextBox
+        data_type: integer
+        notes: 
+        notes_display: 
+        display: edit
+        display_method: 
+        display_method_options: {}
+        required: false
+        required_method: 
+        required_method_options: {}
+        default_value: ''
+        values: 
+        values_method: 
+        values_method_options: {}
+        options:
+          :protected: false
+          :show_past_days: false
+          :force_multi_value: false
+        label: vm_cpu
+        position: 2
+        validator_type: f
+        validator_rule: 
+        reconfigurable: false
+        dynamic: false
+        show_refresh_button: false
+        load_values_on_init: true
+        read_only: false
+        auto_refresh: false
+        trigger_auto_refresh: false
+        visible: false
+        refresh_fields: 
+        resource_action:
+          action: 
+          resource_type: DialogField
+          ae_namespace: 
+          ae_class: 
+          ae_instance: 
+          ae_message: 
+          ae_attributes: {}
+        dialog_field_responders: []
+      - name: vm_memory
+        description: ''
+        type: DialogFieldTextBox
+        data_type: integer
+        notes: 
+        notes_display: 
+        display: edit
+        display_method: 
+        display_method_options: {}
+        required: false
+        required_method: 
+        required_method_options: {}
+        default_value: ''
+        values: 
+        values_method: 
+        values_method_options: {}
+        options:
+          :protected: false
+          :show_past_days: false
+          :force_multi_value: false
+        label: vm_memory
+        position: 3
+        validator_type: f
+        validator_rule: 
+        reconfigurable: false
+        dynamic: false
+        show_refresh_button: false
+        load_values_on_init: true
+        read_only: false
+        auto_refresh: false
+        trigger_auto_refresh: false
+        visible: false
+        refresh_fields: 
+        resource_action:
+          action: 
+          resource_type: DialogField
+          ae_namespace: 
+          ae_class: 
+          ae_instance: 
+          ae_message: 
+          ae_attributes: {}
+        dialog_field_responders: []
+      - name: system_disk
+        description: ''
+        type: DialogFieldTextBox
+        data_type: integer
+        notes: 
+        notes_display: 
+        display: edit
+        display_method: 
+        display_method_options: {}
+        required: false
+        required_method: 
+        required_method_options: {}
+        default_value: ''
+        values: 
+        values_method: 
+        values_method_options: {}
+        options:
+          :protected: false
+          :show_past_days: false
+          :force_multi_value: false
+        label: vm_system_disk
+        position: 4
+        validator_type: f
+        validator_rule: 
+        reconfigurable: false
+        dynamic: false
+        show_refresh_button: false
+        load_values_on_init: true
+        read_only: false
+        auto_refresh: false
+        trigger_auto_refresh: false
+        visible: false
+        refresh_fields: 
+        resource_action:
+          action: 
+          resource_type: DialogField
+          ae_namespace: 
+          ae_class: 
+          ae_instance: 
+          ae_message: 
+          ae_attributes: {}
+        dialog_field_responders: []
+      - name: description
+        description: ''
+        type: DialogFieldTextBox
+        data_type: string
+        notes: 
+        notes_display: 
+        display: edit
+        display_method: 
+        display_method_options: {}
+        required: false
+        required_method: 
+        required_method_options: {}
+        default_value: ''
+        values: 
+        values_method: 
+        values_method_options: {}
+        options:
+          :protected: false
+          :show_past_days: false
+          :force_multi_value: false
+        label: description
+        position: 5
+        validator_type: f
+        validator_rule: 
+        reconfigurable: false
+        dynamic: false
+        show_refresh_button: false
+        load_values_on_init: true
+        read_only: false
+        auto_refresh: false
+        trigger_auto_refresh: false
+        visible: false
+        refresh_fields: 
+        resource_action:
+          action: 
+          resource_type: DialogField
+          ae_namespace: 
+          ae_class: 
+          ae_instance: 
+          ae_message: 
+          ae_attributes: {}
+        dialog_field_responders: []
