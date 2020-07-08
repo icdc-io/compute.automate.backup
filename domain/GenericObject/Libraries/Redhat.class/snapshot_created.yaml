@@ -1,0 +1,12 @@
+---
+object_type: instance
+version: 1.0
+object:
+  attributes:
+    display_name: 
+    name: snapshot_created
+    inherits: 
+    description: 
+  fields:
+  - create_template:
+      value: snapshot_created

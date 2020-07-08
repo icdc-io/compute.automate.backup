@@ -1,0 +1,12 @@
+---
+object_type: instance
+version: 1.0
+object:
+  attributes:
+    display_name: 
+    name: template_created
+    inherits: 
+    description: 
+  fields:
+  - clearing_after_backup:
+      value: clearing_after_backup

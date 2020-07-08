@@ -3,8 +3,8 @@ object_type: namespace
 version: 1.0
 object:
   attributes:
-    name: Backup
-    description: ''
+    name: System
+    description: 
     display_name: 
     priority: 
     enabled: 

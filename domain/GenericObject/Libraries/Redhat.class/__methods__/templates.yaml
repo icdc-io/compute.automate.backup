@@ -1,0 +1,14 @@
+---
+object_type: method
+version: 1.0
+object:
+  attributes:
+    name: Templates
+    display_name: 
+    description: 
+    scope: instance
+    language: ruby
+    location: inline
+    embedded_methods:
+    - "/GenericObject/Libraries/Redhat/lib"
+  inputs: []
