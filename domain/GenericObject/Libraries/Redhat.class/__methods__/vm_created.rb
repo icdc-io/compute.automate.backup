@@ -1,5 +1,5 @@
 event = $evm.vmdb(:EventStream).find($evm.root['event_id'])
-uid = event.full_data.vm.id
+uid = event.full_data["vm"]["id"]
 event_msg = event.message
 rematch = event_msg.match(/^VM (rst_.+) creation has been completed./) # || event_msg.match(/^VM (dev_.+) creation has been completed./)
 rematch_cl = event_msg.match(/^VM (cld_cl-.+) creation has been completed./)
