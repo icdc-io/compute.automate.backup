@@ -7,7 +7,6 @@ rematch_cl = event_msg.match(/^VM (cld_cl-.+) creation has been completed./)
 vm_name = rematch[1] if rematch
 vm_name = rematch_cl[1] if rematch_cl
 exit MIQ_ERROR unless vm_name
-rematch = true
 if rematch
   $evm.log(:info, "in restore branch")
   restore = Restore.find_objects(:name => vm_name).sort_by(&:created_at).last
@@ -19,10 +18,9 @@ elsif rematch_cl
   parent_vm_id = vm_name[/\-[0-9]+\-/].delete("-")
   parent_vm = $evm.vmdb(:Vm).find(parent_vm_id)
   vm = get_vm_from_vmdb(uid)
-  fix_network_clone(parent_vm_id, vm.id)
   vm_updated = add_vm_to_service(parent_vm_id, vm.id)
   snapshot_name = get_snapshot_description(vm_name)
   clearing_after_cloning(snapshot_name)
-  $evm.instantiate("Service/Email/EmailProfiles/User")
-  send_email(parent_vm, vm_updated, $evm.root['hostname'], $evm.root['ip'])
+  $evm.instantiate("Service/Email/Email/Email")
+  send_email(parent_vm, vm_updated)
 end
