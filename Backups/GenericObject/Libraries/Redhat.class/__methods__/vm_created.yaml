@@ -11,4 +11,6 @@ object:
     location: inline
     embedded_methods:
     - "/GenericObject/Libraries/Redhat/lib"
+    - "/Service/Email/Email/CloneService"
+    relative_path: GenericObject/Libraries/Redhat/vm_created
   inputs: []

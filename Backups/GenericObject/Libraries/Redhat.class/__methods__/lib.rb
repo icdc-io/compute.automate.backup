@@ -20,6 +20,19 @@ def replace_name_to_filename(disk_name, template)
   template.hardware.disks.select { |x| x if x.device_name == disk_name }.first.filename
 end
 
+def wait_ip(vm)
+  ip = ''
+  30.times do 
+    unless vm.ipaddresses.any?
+      vm.ext_management_system.refresh
+      sleep(10.seconds)
+    else
+      return vm.ipaddresses.first
+    end
+  end
+  ip
+end
+
 def save_vm_configuration(vm)
   configuration = {}
   configuration[:disks] = {}
