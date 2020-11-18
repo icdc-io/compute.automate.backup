@@ -1,0 +1,196 @@
+---
+custom_button_set:
+- attributes:
+    name: Service|Service|
+    description: Service
+    set_type: CustomButtonSet
+    guid: f020056d-12f8-4e10-a2dd-a2c313f6d6a9
+    read_only: 
+    set_data:
+      :button_order:
+      - 19000000000001
+      - 19000000000003
+      - 19000000000004
+      - 19000000000002
+      - 19000000000005
+      :button_icon: ff ff-action
+      :display: true
+      :group_index: 1
+      :applies_to_class: Service
+    mode: 
+    owner_type: 
+    owner_id: 
+    userid: 
+    group_id: 
+  children:
+    custom_button:
+    - attributes:
+        guid: 89774318-da1d-4fea-8602-fd94e27030ff
+        description: undo_backup
+        applies_to_class: Service
+        visibility_expression: 
+        options:
+          :button_icon: ff ff-hexagon
+          :button_type: default
+          :display: true
+          :open_url: false
+          :display_for: single
+          :submit_how: one
+        userid: admin
+        wait_for_complete: 
+        name: undo_backup
+        visibility:
+          :roles:
+          - _ALL_
+        applies_to_id: 
+        enablement_expression: 
+        disabled_text: 
+      associations:
+        resource_action:
+        - attributes:
+            action: 
+            resource_type: CustomButton
+            ae_namespace: SYSTEM
+            ae_class: PROCESS
+            ae_instance: Request
+            ae_message: create
+            ae_attributes:
+              request: undo_backup
+            configuration_template_id: 
+            configuration_template_type: 
+    - attributes:
+        guid: 296dcb90-4fa5-4d01-ab8c-10d704432649
+        description: save_backup
+        applies_to_class: Service
+        visibility_expression: 
+        options:
+          :button_icon: ff ff-hexagon
+          :button_type: default
+          :display: true
+          :open_url: false
+          :display_for: single
+          :submit_how: one
+        userid: admin
+        wait_for_complete: 
+        name: save_backup
+        visibility:
+          :roles:
+          - _ALL_
+        applies_to_id: 
+        enablement_expression: 
+        disabled_text: 
+      associations:
+        resource_action:
+        - attributes:
+            action: 
+            resource_type: CustomButton
+            ae_namespace: SYSTEM
+            ae_class: PROCESS
+            ae_instance: Request
+            ae_message: create
+            ae_attributes:
+              request: save_backup
+            configuration_template_id: 
+            configuration_template_type: 
+    - attributes:
+        guid: 7ac4ccd0-a6c6-4e72-9fc0-4c908c674a20
+        description: restore_backup
+        applies_to_class: Service
+        visibility_expression: 
+        options:
+          :button_icon: ff ff-hexagon
+          :button_type: default
+          :display: true
+          :open_url: false
+          :display_for: single
+          :submit_how: one
+        userid: admin
+        wait_for_complete: 
+        name: restore_backup
+        visibility:
+          :roles:
+          - _ALL_
+        applies_to_id: 
+        enablement_expression: 
+        disabled_text: 
+      associations:
+        resource_action:
+        - attributes:
+            action: 
+            resource_type: CustomButton
+            ae_namespace: SYSTEM
+            ae_class: PROCESS
+            ae_instance: Request
+            ae_message: create
+            ae_attributes:
+              request: restore_backup
+            configuration_template_id: 
+            configuration_template_type: 
+    - attributes:
+        guid: 7afb3148-7a7b-4461-a13e-ebaf6086e2f9
+        description: delete_backup
+        applies_to_class: Service
+        visibility_expression: 
+        options:
+          :button_icon: ff ff-hexagon
+          :button_type: default
+          :display: true
+          :open_url: false
+          :display_for: single
+          :submit_how: one
+        userid: admin
+        wait_for_complete: 
+        name: delete_backup
+        visibility:
+          :roles:
+          - _ALL_
+        applies_to_id: 
+        enablement_expression: 
+        disabled_text: 
+      associations:
+        resource_action:
+        - attributes:
+            action: 
+            resource_type: CustomButton
+            ae_namespace: SYSTEM
+            ae_class: PROCESS
+            ae_instance: Request
+            ae_message: create
+            ae_attributes:
+              request: RemoveBackup
+            configuration_template_id: 
+            configuration_template_type: 
+    - attributes:
+        guid: 7f49fa60-f708-4514-b469-65a1cba1f91d
+        description: call_automation
+        applies_to_class: Service
+        visibility_expression: 
+        options:
+          :button_icon: ff ff-hexagon
+          :button_type: default
+          :display: true
+          :open_url: false
+          :display_for: single
+          :submit_how: one
+        userid: admin
+        wait_for_complete: 
+        name: call_automation
+        visibility:
+          :roles:
+          - _ALL_
+        applies_to_id: 
+        enablement_expression: 
+        disabled_text: 
+      associations:
+        resource_action:
+        - attributes:
+            action: 
+            resource_type: CustomButton
+            ae_namespace: SYSTEM
+            ae_class: PROCESS
+            ae_instance: Request
+            ae_message: create
+            ae_attributes:
+              request: CallAutomation
+            configuration_template_id: 
+            configuration_template_type: 
