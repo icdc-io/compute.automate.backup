@@ -1,0 +1,16 @@
+---
+- GenericObjectDefinition:
+    name: Restore
+    description: Restore
+    properties:
+      :attributes:
+        name: :string
+        status: :string
+        error: :boolean
+        original_vm_uuid: :string
+        new_vm_uuid: :string
+        backup_name: :string
+      :associations:
+        service: Service
+        backup: GenericObject
+      :methods: []
