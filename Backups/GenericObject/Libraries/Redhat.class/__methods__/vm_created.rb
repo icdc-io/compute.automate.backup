@@ -20,7 +20,7 @@ elsif rematch_cl
   vm = get_vm_from_vmdb(uid)
   vm_updated = add_vm_to_service(parent_vm_id, vm.id)
   snapshot_name = get_snapshot_description(vm_name)
-  clearing_after_cloning(snapshot_name)
+  clearing_after_cloning(snapshot_name, parent_vm)
   $evm.instantiate("Service/Email/Email/Email")
   send_email(parent_vm, vm_updated)
 end

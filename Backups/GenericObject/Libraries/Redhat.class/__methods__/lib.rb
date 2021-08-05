@@ -48,6 +48,7 @@ def save_vm_configuration(vm)
     configuration[:nics][nic.device_name][:id] = nic.uid_ems
     configuration[:nics][nic.device_name][:mac] = nic.address
   end
+  
   configuration
 end
 
@@ -73,7 +74,7 @@ def change_vm_configuration(restore)
       connection.system_service.vms_service.vm_service(original_uid).nics_service.nic_service(original_nic_id).update(:mac => {:address => new_mac})
       flag = true
     end
-  rescue StandardError  => e
+  rescue StandardError
     vm = get_vm_from_vmdb(restore.new_vm_uuid)
     retry if (count += 1) < 100
     exit MIQ_ERROR
@@ -130,9 +131,12 @@ def add_vm_to_service(parent_vm_id, new_vm_id)
   vm
 end
 
-def clearing_after_cloning(snapshot_uuid)
+def clearing_after_cloning(snapshot_uuid, vm)
   snapshot = get_snapshot_from_vmdb(snapshot_uuid)
   snapshot.remove
+  vm.custom_set(:cloning, nil)
+  vm.ext_management_system.refresh
+
 end
 
 def final_restoring(restore, vm)
@@ -152,9 +156,10 @@ end
 def get_snapshot_from_vmdb(snapshot_uuid)
   snapshot = $evm.vmdb(:Snapshot).find_by(:description => snapshot_uuid)
   10.times do
-    break if snapshot
+    unless snapshot
     sleep 5
     snapshot = $evm.vmdb(:Snapshot).find_by(:description => snapshot_uuid)
+    end
   end
   snapshot
 end
