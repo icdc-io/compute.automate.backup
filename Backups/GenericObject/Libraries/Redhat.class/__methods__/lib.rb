@@ -59,16 +59,18 @@ def change_vm_configuration(restore)
   nics = configuration["nics"]
   vm_name = configuration["vm_name"]
   vm = get_vm_from_vmdb(restore.new_vm_uuid)
+  prev_vm = $evm.vmdb(:VmOrTemplate).find_by(:name => vm_name)
   connection = vm.ext_management_system.connect
+  connection.system_service.vms_service.vm_service(prev_vm.uid_ems).shutdown
+  connection.system_service.vms_service.vm_service(vm.uid_ems).shutdown
+  sleep(5)
   begin
     connection.system_service.vms_service.vm_service(restore.new_vm_uuid).nics_service.list.each do |nic|
       original_mac = nics[nic.name.to_s]["mac"]
       new_mac = connection.system_service.vms_service.vm_service(restore.new_vm_uuid).nics_service.list.first.mac.address
       temp_addr = get_dummy_mac
-      
       original_uid = $evm.vmdb(:Vm).find_by(:name => vm_name).uid_ems 
       original_nic_id  = $evm.vmdb(:Vm).find_by(:name => vm_name).nics.first.uid_ems
- 
       connection.system_service.vms_service.vm_service(original_uid).nics_service.nic_service(original_nic_id).update(:mac => {:address => temp_addr})
       connection.system_service.vms_service.vm_service(restore.new_vm_uuid).nics_service.nic_service(nic.id).update(:mac => {:address => original_mac})
       connection.system_service.vms_service.vm_service(original_uid).nics_service.nic_service(original_nic_id).update(:mac => {:address => new_mac})
@@ -157,8 +159,8 @@ def get_snapshot_from_vmdb(snapshot_uuid)
   snapshot = $evm.vmdb(:Snapshot).find_by(:description => snapshot_uuid)
   10.times do
     unless snapshot
-    sleep 5
-    snapshot = $evm.vmdb(:Snapshot).find_by(:description => snapshot_uuid)
+      sleep 5
+      snapshot = $evm.vmdb(:Snapshot).find_by(:description => snapshot_uuid)
     end
   end
   snapshot
@@ -195,6 +197,7 @@ def active_backups_count(service)
 end
 
 def lock_other_backups(service)
+  
   service.generic_objects.each do |go|
     if go.name.start_with?("bkp_") && !go.terminated && go.status.eql?("ready")
       go.update!(:status => 'locked')
