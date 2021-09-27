@@ -9,4 +9,4 @@ object:
     description: 
   fields:
   - step1:
-      value: "\tmethod::undo"
+      value: "method::undo"
