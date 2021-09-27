@@ -1,5 +1,4 @@
-#backup_id = '26000000000009' 
-$evm.root['backup_id']
+backup_id = $evm.root['backup_id']
 backup = $evm.vmdb(:GenericObject).find(backup_id)
 exit MIQ_OK if active_backups_count(backup.service.first).positive?
 lock_other_backups(backup.service.first)
