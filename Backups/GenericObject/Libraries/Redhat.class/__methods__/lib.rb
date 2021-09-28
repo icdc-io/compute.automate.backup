@@ -21,16 +21,24 @@ def replace_name_to_filename(disk_name, template)
 end
 
 def wait_ip(vm)
-  ip = ''
-  30.times do 
-    unless vm.ipaddresses.any?
-      vm.ext_management_system.refresh
-      sleep(10.seconds)
-    else
-      return vm.ipaddresses.first
+  ips = []
+  network_manager = vm.ext_management_system.try(:network_manager)
+  nics = vm.hardware.nics
+  if network_manager && nics.reject{|nic| nic.lan&.name}.present?
+    $evm.root['ae_result'] = 'retry'
+    $evm.root['ae_retry_interval'] = 1.minute
+    network_manager.refresh
+  else
+    nics.each do |nic|
+      cloud_network = $evm.vmdb(:CloudNetwork).find_by(:name => nic.lan.name)
+      next unless cloud_network
+      port = cloud_network.network_ports.detect{|np| np.device&.id == nic.id}
+      $evm.log('info', "port: #{port}")
+      $evm.log('info', "ips: #{port.ipaddresses}") # also has fixed_ip_addresses
+      ips << port.ipaddresses
     end
+    ips.flatten
   end
-  ip
 end
 
 def save_vm_configuration(vm)
