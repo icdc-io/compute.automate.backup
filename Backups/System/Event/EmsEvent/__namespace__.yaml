@@ -4,7 +4,9 @@ version: 1.0
 object:
   attributes:
     name: EmsEvent
-    description: 
-    display_name: 
-    priority: 
-    enabled: 
+    description:
+    display_name:
+    priority:
+    enabled:
+    ancestry: 26000000084502/26000000096661/26000000096662
+    relative_path: System/Event/EmsEvent

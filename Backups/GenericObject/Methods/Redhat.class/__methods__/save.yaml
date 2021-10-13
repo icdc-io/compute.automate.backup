@@ -4,11 +4,12 @@ version: 1.0
 object:
   attributes:
     name: save
-    display_name: 
-    description: 
+    display_name:
+    description:
     scope: instance
     language: ruby
     location: inline
     embedded_methods:
     - "/GenericObject/Libraries/Redhat/lib"
+    relative_path: GenericObject/Methods/Redhat/save
   inputs: []

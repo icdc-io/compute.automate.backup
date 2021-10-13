@@ -4,11 +4,12 @@ version: 1.0
 object:
   attributes:
     name: Templates
-    display_name: 
-    description: 
+    display_name:
+    description:
     scope: instance
     language: ruby
     location: inline
     embedded_methods:
     - "/GenericObject/Libraries/Redhat/lib"
+    relative_path: GenericObject/Libraries/Redhat/Templates
   inputs: []
