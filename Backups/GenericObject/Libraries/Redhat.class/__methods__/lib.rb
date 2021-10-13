@@ -20,19 +20,6 @@ def replace_name_to_filename(disk_name, template)
   template.hardware.disks.select { |x| x if x.device_name == disk_name }.first.filename
 end
 
-def wait_ip(vm)
-  ip = ''
-  30.times do 
-    unless vm.ipaddresses.any?
-      vm.ext_management_system.refresh
-      sleep(10.seconds)
-    else
-      return vm.ipaddresses.first
-    end
-  end
-  ip
-end
-
 def save_vm_configuration(vm)
   configuration = {}
   configuration[:disks] = {}
@@ -48,6 +35,7 @@ def save_vm_configuration(vm)
     configuration[:nics][nic.device_name][:id] = nic.uid_ems
     configuration[:nics][nic.device_name][:mac] = nic.address
   end
+  
   configuration
 end
 
@@ -58,60 +46,29 @@ def change_vm_configuration(restore)
   nics = configuration["nics"]
   vm_name = configuration["vm_name"]
   vm = get_vm_from_vmdb(restore.new_vm_uuid)
+  prev_vm = $evm.vmdb(:VmOrTemplate).find_by(:name => vm_name)
   connection = vm.ext_management_system.connect
+  connection.system_service.vms_service.vm_service(prev_vm.uid_ems).shutdown
+  connection.system_service.vms_service.vm_service(vm.uid_ems).shutdown
+  sleep(5)
   begin
     connection.system_service.vms_service.vm_service(restore.new_vm_uuid).nics_service.list.each do |nic|
       original_mac = nics[nic.name.to_s]["mac"]
       new_mac = connection.system_service.vms_service.vm_service(restore.new_vm_uuid).nics_service.list.first.mac.address
       temp_addr = get_dummy_mac
-      
       original_uid = $evm.vmdb(:Vm).find_by(:name => vm_name).uid_ems 
       original_nic_id  = $evm.vmdb(:Vm).find_by(:name => vm_name).nics.first.uid_ems
- 
       connection.system_service.vms_service.vm_service(original_uid).nics_service.nic_service(original_nic_id).update(:mac => {:address => temp_addr})
       connection.system_service.vms_service.vm_service(restore.new_vm_uuid).nics_service.nic_service(nic.id).update(:mac => {:address => original_mac})
       connection.system_service.vms_service.vm_service(original_uid).nics_service.nic_service(original_nic_id).update(:mac => {:address => new_mac})
       flag = true
     end
-  rescue StandardError  => e
+  rescue StandardError
     vm = get_vm_from_vmdb(restore.new_vm_uuid)
     retry if (count += 1) < 100
     exit MIQ_ERROR
   end
   final_restoring(restore, vm) if flag
-end
-
-def get_dummy_mac
-  (1..6).map { "%0.2X" % rand(256) }.join(":").downcase
-end
-
-def fix_network_clone(parent_vm_id, new_vm_id)
-  parent_vm = $evm.vmdb(:Vm).find(parent_vm_id)
-  new_vm = $evm.vmdb(:Vm).find(new_vm_id)
-  # even if hostname exists, we should use a new one
-  hostname = generate_hostname
-  $evm.root['hostname'] = hostname
-  begin
-    lan_name = parent_vm.hardware.nics[0].lan.name
-    mac = new_vm.mac_addresses[0]
-    raise StandardError, 'no mac address' unless mac
-  rescue StandardError
-    $evm.log(:info, "No hardware info in vm object, retry with ovirt data..")
-    connection = new_vm.ext_management_system.connect
-    vm_service = connection.system_service.vms_service.vm_service(new_vm.uid_ems)
-    nic_uuid = vm_service.nics_service.list.first.id
-    vnic_profile_id = vm_service.nics_service.nic_service(nic_uuid).get.vnic_profile.id
-    lan_name = connection.system_service.vnic_profiles_service.list.select { |x| x.id == vnic_profile_id }.first.name
-    mac = vm_service.nics_service.list.first.mac.address
-  end
-  network_parameters = get_dhcp_addr_lib(lan_name)
-  subnet_ip_addr = network_parameters['network']
-  start_ip = network_parameters['from']
-  end_ip = network_parameters['to']
-  ip_range = "from=" + start_ip + "&to=" + end_ip
-  $evm.instantiate("/Integration/Foreman/Creds/Default")
-  $evm.log(:info, "DBG clone network params: #{mac} lan_name #{lan_name} hostname #{hostname} subnet_ip_addr #{subnet_ip_addr} ip_range #{ip_range}")
-  vm_registration_lib(hostname, lan_name, subnet_ip_addr, ip_range, mac)
 end
 
 def add_vm_to_service(parent_vm_id, new_vm_id)
@@ -128,11 +85,6 @@ def add_vm_to_service(parent_vm_id, new_vm_id)
   vm.start
   $evm.log(:info, "vm #{vm.id} is added to service #{new_service.name} - #{new_service.id}")
   vm
-end
-
-def clearing_after_cloning(snapshot_uuid)
-  snapshot = get_snapshot_from_vmdb(snapshot_uuid)
-  snapshot.remove
 end
 
 def final_restoring(restore, vm)
@@ -152,9 +104,10 @@ end
 def get_snapshot_from_vmdb(snapshot_uuid)
   snapshot = $evm.vmdb(:Snapshot).find_by(:description => snapshot_uuid)
   10.times do
-    break if snapshot
-    sleep 5
-    snapshot = $evm.vmdb(:Snapshot).find_by(:description => snapshot_uuid)
+    unless snapshot
+      sleep 5
+      snapshot = $evm.vmdb(:Snapshot).find_by(:description => snapshot_uuid)
+    end
   end
   snapshot
 end
@@ -215,9 +168,4 @@ def check_archived(uid_ems)
   ems_id_nil = $evm.vmdb(:VmOrTemplate).find_by(:uid_ems => uid_ems).ext_management_system.nil?
   storage_id_nil = $evm.vmdb(:VmOrTemplate).find_by(:uid_ems => uid_ems).storage_id.nil?
   ems_id_nil && storage_id_nil
-end
-
-def get_snapshot_description(vm_name)
-  vm_name.slice!("cld_cl")
-  "clone" + vm_name
 end

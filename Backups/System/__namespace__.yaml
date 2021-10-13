@@ -4,7 +4,9 @@ version: 1.0
 object:
   attributes:
     name: System
-    description: 
-    display_name: 
-    priority: 
-    enabled: 
+    description:
+    display_name:
+    priority:
+    enabled:
+    ancestry: '26000000084502'
+    relative_path: System
