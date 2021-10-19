@@ -2,7 +2,7 @@ backup_id = $evm.root['backup_id']
 backup = $evm.vmdb(:GenericObject).find(backup_id)
 exit MIQ_OK if active_backups_count(backup.service.first).positive?
 lock_other_backups(backup.service.first)
-new_restore = Restore.create_object(:name             => "rst_" + backup.service.first.vms.first.name[4..-1],
+new_restore = Restore.create_object(:name             => "rst_" + backup.service.first.vms.first.name.split("_")[1..-1].join("_"),
                                     :status           => "restoring",
                                     :error            => false,
                                     :original_vm_uuid => backup.service.first.vms.first.uid_ems,
