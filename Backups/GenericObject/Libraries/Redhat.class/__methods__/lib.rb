@@ -39,6 +39,10 @@ def save_vm_configuration(vm)
   configuration
 end
 
+def get_dummy_mac
+  (1..6).map { "%0.2X" % rand(256) }.join(":").downcase
+end
+
 def change_vm_configuration(restore)
   configuration = JSON.parse(restore.backup.first.configuration)
   flag = false
