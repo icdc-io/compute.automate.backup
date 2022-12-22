@@ -28,7 +28,7 @@ def save_vm_configuration(vm)
   vm.disks.each do |disk|
     storage = $evm.vmdb(:Storage).find(disk.storage_id).name
     configuration[:disks][disk.device_name] = {}
-    configuration[:disks][disk.device_name][:storage_type] = $evm.vmdb(:Storage).find(disk.storage_id).tags.select { |s| s if s.match?(/disk_type/) }.first.split('/').last
+    configuration[:disks][disk.device_name][:storage_type] = $evm.vmdb(:Storage).find(disk.storage_id).tags.select { |s| s if s.match?(/storage_type/) }.first.split('/').last
   end
   vm.hardware.nics.each do |nic|
     configuration[:nics][nic.device_name] = {}
