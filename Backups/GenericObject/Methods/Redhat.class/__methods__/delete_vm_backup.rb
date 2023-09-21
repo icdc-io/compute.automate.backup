@@ -1,9 +1,12 @@
 backup_id = $evm.root['backup_id']
 backup = $evm.vmdb(:GenericObject).find(backup_id)
 exit MIQ_OK if backup.terminated
-connection = establish_connection(backup.service.first.vms.first)
 
 if backup.template_id.nil?
+  exit MIQ_OK if backup.service.first.vms.first.nil?
+  # TODO: if there is no VM in service may be need to take default ext_management_system
+  #       or take service template which used to deploy this ervice
+  connection = establish_connection(backup.service.first.vms.first) # take connection by first vm
   template = connection.system_service.templates_service.list.select { |d| d.name == backup.name }
   exit MIQ_OK if template.first.nil?
   uid = template.first.id 
@@ -20,6 +23,7 @@ else
     backup.update_attributes!(:terminated => "true")
     exit MIQ_OK
   end
+  connection = establish_connection(template) # take connection by template
 
   is_archived = check_archived(template.uid_ems)
   is_orphaned = check_orphaned(template.uid_ems)
