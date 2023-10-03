@@ -49,10 +49,7 @@ module Backups
             end
 
             def backup_description
-              description = @handle.root['backup_name'].to_s
-              return 'Manual Backup' if description.blank?
-
-              description
+              @handle.root['backup_name'].blank? ? 'Manual backup' : @handle.root['backup_name']
             end
           end
         end
