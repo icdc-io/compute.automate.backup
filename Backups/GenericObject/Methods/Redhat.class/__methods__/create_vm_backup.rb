@@ -3,56 +3,53 @@ module Backups
     module GenericObject
       module Methods
         module Redhat
-          class DeleteVmBackup
+          class CreateVmBackup
             def initialize(handle = $evm)
               @handle = handle
-              @backup = @handle.vmdb(:GenericObject).find(@handle.root['backup_id'])
+              @service = @handle.root['service']
+              @vm = @handle.vmdb(:VmOrTemplate).find_by(id: @handle.root['vm_id']) # vm_id can be 'all' or id of vm
             end
 
             def main
-              return if @backup.terminated
+              exit MIQ_OK if active_backups_count(@service).positive?
 
-              @handle.log(:info, "Start deleting backup #{@backup.name} (#{@backup.id})")
-              delete_vm_backup
-              @handle.log(:info, 'End deleting backup')
+              @handle.log(:info, "Start creating backup for VM #{@vm&.name} in service #{@service.name}")
+              create_vm_backup
+              @handle.log(:info, 'End creating backup')
             end
 
             private
 
-            def delete_vm_backup
-              return if backup_template_orphaned_or_archived?
-
-              remove_template_request
+            def create_vm_backup
+              vms = backup_for_all_vms? ? @service.vms : [@vm]
+              vms.each do |vm|
+                new_backup = Backup.create_object(backup_params_for_vm(vm))
+                new_backup.service = [vm.direct_service]
+                new_backup.add_to_service(vm.direct_service)
+                new_backup.save!
+                create_snapshot(vm, new_backup)
+              end
             end
 
-            def backup_template_orphaned_or_archived?
-              is_archived = check_archived(backup_template.uid_ems)
-              is_orphaned = check_orphaned(backup_template.uid_ems)
-              is_archived || is_orphaned
+            def backup_for_all_vms?
+              @handle.root['vm_id'] == 'all'
             end
 
-            def backup_template
-              @backup_template ||= if @backup.template_id.nil?
-                                     find_backup_template(name: @backup.name)
-                                   else
-                                     find_backup_template(id: @backup.template_id)
-                                   end
+            def backup_params_for_vm(vm)
+              {
+                name: "bkp_#{vm.id}_#{Time.now.strftime('%Y%m%d-%H%M')}", # rubocop:disable Rails/TimeZone
+                status: 'not_started',
+                error: false,
+                snapshot_uuid: nil,
+                template_id: nil,
+                terminated: false,
+                configuration: save_vm_configuration(vm).to_json,
+                description: backup_description
+              }
             end
 
-            def find_backup_template(params = {})
-              template = @handle.vmdb(:VmOrTemplate).find_by(params)
-              return template if template
-
-              @handle.log(:info, "Template with params [#{params.inspect}] doesn`t exist.")
-              @backup.update!(terminated: 'true')
-              exit MIQ_OK
-            end
-
-            def remove_template_request
-              connection = establish_connection(backup_template) # take connection by template
-              remove_template(connection, backup_template.uid_ems, @backup)
-            rescue StandardError => e
-              @handle.log(:error, "Attempt to remove template #{e.message}")
+            def backup_description
+              @handle.root['backup_name'].blank? ? 'Manual backup' : @handle.root['backup_name']
             end
           end
         end
@@ -61,4 +58,4 @@ module Backups
   end
 end
 
-Backups::Automate::GenericObject::Methods::Redhat::DeleteVmBackup.new.main
+Backups::Automate::GenericObject::Methods::Redhat::CreateVmBackup.new.main
