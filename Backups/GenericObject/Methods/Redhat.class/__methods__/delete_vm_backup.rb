@@ -14,49 +14,15 @@ module Backups
 
               @handle.log(:info, "Start deleting backup #{@backup.name} (#{@backup.id})")
               delete_vm_backup
-              @handle.log('info', 'End deleting backup')
+              @handle.log(:info, 'End deleting backup')
             end
 
             private
 
             def delete_vm_backup
-              if @backup.template_id.nil?
-                # TODO: if there is no VM in service may be need to take default ext_management_system
-                #       or take service template which used to deploy this service
-                return @backup.destroy! if backup_vm.nil?
+              return if backup_template_orphaned_or_archived?
 
-                backup_name = @backup.name
-                template = connection.system_service.templates_service.list.find do |template_service|
-                  template_service.name == backup_name
-                end
-                return @backup.destroy! if template.nil?
-
-                remove_template_request(template.id)
-              else
-                return if backup_template_orphaned_or_archived?
-
-                remove_template_request(backup_template.uid_ems)
-              end
-            end
-
-            def connection
-              @connection ||= establish_connection(backup_vm_or_template) # take connection by vm or template
-            end
-
-            def backup_vm_or_template
-              @backup_vm_or_template ||= @backup.template_id.nil? ? backup_vm : backup_template
-            end
-
-            def backup_vm
-              @backup_vm ||= @backup.service.first.vms.first
-            end
-
-            def backup_template
-              @backup_template ||= @handle.vmdb(:VmOrTemplate).find(@backup.template_id)
-            rescue StandardError
-              @handle.log(:info, "Template with id [#{@backup.template_id}] doesn`t exist.")
-              @backup.update!(terminated: 'true')
-              exit MIQ_OK
+              remove_template_request
             end
 
             def backup_template_orphaned_or_archived?
@@ -65,8 +31,26 @@ module Backups
               is_archived || is_orphaned
             end
 
-            def remove_template_request(template_id)
-              remove_template(connection, template_id, @backup)
+            def backup_template
+              @backup_template ||= if @backup.template_id.nil?
+                                     find_backup_template(name: @backup.name)
+                                   else
+                                     find_backup_template(id: @backup.template_id)
+                                   end
+            end
+
+            def find_backup_template(params = {})
+              template = @handle.vmdb(:VmOrTemplate).find_by(params)
+              return template if template
+
+              @handle.log(:info, "Template with params [#{params.inspect}] doesn`t exist.")
+              @backup.update!(terminated: 'true')
+              exit MIQ_OK
+            end
+
+            def remove_template_request
+              connection = establish_connection(backup_template) # take connection by template
+              remove_template(connection, backup_template.uid_ems, @backup)
             rescue StandardError => e
               @handle.log(:error, "Attempt to remove template #{e.message}")
             end
