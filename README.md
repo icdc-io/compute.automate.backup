@@ -4,6 +4,7 @@ Automation package `Backups` consists of:
 
  - Automation Code
  - Service Dialog
+ - Custom Buttons (with attached Service Dialog)
  - GenericObject Definition
 
 # HowTo: Import automation package to DEV environment
