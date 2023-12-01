@@ -3,11 +3,11 @@ object_type: method
 version: 1.0
 object:
   attributes:
-    name: Snapshots
-    display_name:
-    description:
+    name: snapshots
+    display_name: 
+    description: 
     scope: instance
     language: ruby
     location: inline
-    relative_path: GenericObject/Libraries/Redhat/Snapshots
+    relative_path: GenericObject/Libraries/Redhat/snapshots
   inputs: []

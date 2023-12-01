@@ -4,13 +4,15 @@ version: 1.0
 object:
   attributes:
     name: create_vm_backup
-    display_name:
-    description:
+    display_name: 
+    description: 
     scope: instance
     language: ruby
     location: inline
     embedded_methods:
-    - "/GenericObject/Libraries/Redhat/lib"
-    - "/GenericObject/Libraries/Redhat/Snapshots"
+    - "/GenericObject/Libraries/Redhat/constant"
+    - "/GenericObject/Libraries/Redhat/service_backups"
+    - "/GenericObject/Libraries/Redhat/snapshots"
+    - "/GenericObject/Libraries/Redhat/vm_configuration"
     relative_path: GenericObject/Methods/Redhat/create_vm_backup
   inputs: []

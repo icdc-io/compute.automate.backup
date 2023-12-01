@@ -3,11 +3,11 @@ object_type: instance
 version: 1.0
 object:
   attributes:
-    display_name:
+    display_name: 
     name: undo
-    inherits:
-    description:
+    inherits: 
+    description: 
     relative_path: GenericObject/Methods/Redhat/undo
   fields:
   - step1:
-      value: method::undo
+      value: method::undo_restored_vm

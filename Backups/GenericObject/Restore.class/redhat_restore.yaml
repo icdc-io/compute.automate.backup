@@ -3,9 +3,9 @@ object_type: instance
 version: 1.0
 object:
   attributes:
-    display_name:
+    display_name: 
     name: Redhat_restore
-    inherits:
-    description:
+    inherits: 
+    description: 
     relative_path: GenericObject/Restore/Redhat_restore
   fields: []

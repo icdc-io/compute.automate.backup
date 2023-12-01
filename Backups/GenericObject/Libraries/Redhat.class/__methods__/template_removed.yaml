@@ -4,12 +4,12 @@ version: 1.0
 object:
   attributes:
     name: template_removed
-    display_name:
-    description:
+    display_name: 
+    description: 
     scope: instance
     language: ruby
     location: inline
     embedded_methods:
-    - "/GenericObject/Libraries/Redhat/lib"
+    - "/GenericObject/Libraries/Redhat/constant"
     relative_path: GenericObject/Libraries/Redhat/template_removed
   inputs: []
