@@ -5,8 +5,8 @@ object:
   attributes:
     name: Methods
     description: ''
-    display_name:
-    priority:
-    enabled:
-    ancestry: 26000000084502/26000000096658
+    display_name: 
+    priority: 
+    enabled: 
+    ancestry: 26000000000222/26000000000572
     relative_path: GenericObject/Methods

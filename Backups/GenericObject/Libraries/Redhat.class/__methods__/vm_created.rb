@@ -1,14 +1,43 @@
-event = $evm.vmdb(:EventStream).find($evm.root['event_id'])
-uid = event.full_data["vm"]["id"]
-event_msg = event.message
-rematch = event_msg.match(/^VM (rst_.+) creation has been completed./) # || event_msg.match(/^VM (dev_.+) creation has been completed./)
+module Backups
+  module Automate
+    module GenericObject
+      module Libraries
+        module Redhat
+          class VmCreated
+            def initialize(handle = $evm)
+              @handle = handle
+              @event = @handle.vmdb(:EventStream).find(@handle.root['event_id'])
+            end
 
-vm_name = rematch[1] if rematch
-exit MIQ_ERROR unless vm_name
-if rematch
-  $evm.log(:info, "in restore branch")
-  restore = Restore.find_objects(:name => vm_name).sort_by(&:created_at).last
-  restore.update!(:status => "vm_created", :new_vm_uuid => uid)
-  change_vm_configuration(restore)
-  restore.backup.first.update!(:status => "restored")
+            def main
+              @handle.log(:info, 'Start vm_created method')
+              vm_created
+              @handle.log(:info, 'End method')
+            end
+
+            private
+
+            def vm_created
+              uid = @event.full_data['vm']['id']
+              event_msg = @event.message
+
+              rematch = event_msg.match(/^VM (rst_.+) creation has been completed./) # || event_msg.match(/^VM (dev_.+) creation has been completed./)
+              vm_name = rematch[1] if rematch
+              exit MIQ_ERROR unless vm_name
+
+              return unless rematch
+
+              @handle.log(:info, 'in restore branch')
+              restore = Restore.find_objects(name: vm_name).max_by(&:created_at)
+              restore.update!(status: 'vm_created', new_vm_uuid: uid)
+              change_vm_configuration(restore)
+              restore.backup.first.update!(status: 'restored')
+            end
+          end
+        end
+      end
+    end
+  end
 end
+
+Backups::Automate::GenericObject::Libraries::Redhat::VmCreated.new.main

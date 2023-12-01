@@ -4,13 +4,15 @@ version: 1.0
 object:
   attributes:
     name: restore_vm_from_backup
-    display_name:
-    description:
+    display_name: 
+    description: 
     scope: instance
     language: ruby
     location: inline
     embedded_methods:
-    - "/GenericObject/Libraries/Redhat/lib"
-    - "/GenericObject/Libraries/Redhat/Templates"
+    - "/GenericObject/Libraries/Redhat/service_backups"
+    - "/GenericObject/Libraries/Redhat/connection"
+    - "/GenericObject/Libraries/Redhat/constant"
+    - "/GenericObject/Libraries/Redhat/templates"
     relative_path: GenericObject/Methods/Redhat/restore_vm_from_backup
   inputs: []

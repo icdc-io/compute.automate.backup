@@ -5,11 +5,11 @@ object:
   attributes:
     name: Backups
     description: ''
-    display_name:
-    priority: 3
+    display_name: 
+    priority: 2
     enabled: true
     tenant_id: 26000000000001
     source: user
-    top_level_namespace:
-    ancestry:
-    relative_path:
+    top_level_namespace: 
+    ancestry: 
+    relative_path: 

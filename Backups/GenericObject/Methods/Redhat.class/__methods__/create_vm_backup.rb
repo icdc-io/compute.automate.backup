@@ -23,7 +23,7 @@ module Backups
             def create_vm_backup
               vms = backup_for_all_vms? ? @service.vms : [@vm]
               vms.compact.each do |vm|
-                new_backup = Backup.create_object(backup_params_for_vm(vm))
+                new_backup = Backup.create_object(vm_backup_params(vm))
                 new_backup.service = [vm.direct_service]
                 new_backup.add_to_service(vm.direct_service)
                 new_backup.save!
@@ -35,7 +35,7 @@ module Backups
               @handle.root['vm_id'] == 'all'
             end
 
-            def backup_params_for_vm(vm)
+            def vm_backup_params(vm)
               {
                 name: "bkp_#{vm.id}_#{Time.now.strftime('%Y%m%d-%H%M')}", # rubocop:disable Rails/TimeZone
                 status: 'not_started',
@@ -43,13 +43,17 @@ module Backups
                 snapshot_uuid: nil,
                 template_id: nil,
                 terminated: false,
-                configuration: save_vm_configuration(vm).to_json,
-                description: backup_description
+                configuration: vm_configuration(vm).to_json,
+                description: vm_backup_description(vm)
               }
             end
 
-            def backup_description
-              @handle.root['backup_name'].blank? ? 'Manual backup' : @handle.root['backup_name']
+            def vm_backup_description(vm)
+              "#{backup_name} (#{vm.name} VM)"
+            end
+
+            def backup_name
+              @backup_name ||= @handle.root['backup_name'].blank? ? 'Manual backup' : @handle.root['backup_name'].strip
             end
           end
         end
