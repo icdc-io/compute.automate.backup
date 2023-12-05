@@ -3,10 +3,10 @@ object_type: instance
 version: 1.0
 object:
   attributes:
-    display_name:
+    display_name: 
     name: template_removed
-    inherits:
-    description:
+    inherits: 
+    description: 
     relative_path: GenericObject/Libraries/Redhat/template_removed
   fields:
   - template_removed:

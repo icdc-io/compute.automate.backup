@@ -1,0 +1,19 @@
+---
+object_type: method
+version: 1.0
+object:
+  attributes:
+    name: undo_restored_vm
+    display_name: 
+    description: 
+    scope: instance
+    language: ruby
+    location: inline
+    embedded_methods:
+    - "/GenericObject/Libraries/Redhat/service_backups"
+    - "/GenericObject/Libraries/Redhat/vmdb"
+    - "/GenericObject/Libraries/Redhat/connection"
+    - "/GenericObject/Libraries/Redhat/constant"
+    - "/GenericObject/Libraries/Redhat/vm"
+    relative_path: GenericObject/Methods/Redhat/undo_restored_vm
+  inputs: []

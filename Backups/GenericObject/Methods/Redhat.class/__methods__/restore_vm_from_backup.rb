@@ -1,16 +1,59 @@
-backup_id = $evm.root['backup_id']
-backup = $evm.vmdb(:GenericObject).find(backup_id)
-exit MIQ_OK if active_backups_count(backup.service.first).positive?
-lock_other_backups(backup.service.first)
-new_restore = Restore.create_object(:name             => "rst_" + backup.service.first.vms.first.name.split("_")[1..-1].join("_"),
-                                    :status           => "restoring",
-                                    :error            => false,
-                                    :original_vm_uuid => backup.service.first.vms.first.uid_ems,
-                                    :backup_name      => backup.name,
-                                    :new_vm_uuid      => nil)
-new_restore.service = [backup.service.first]
-new_restore.backup = [backup]
-new_restore.add_to_service(backup.service.first)
-new_restore.save!
-connection =  backup.service.first.vms.first.ext_management_system.connect
-create_vm_from_template(connection, new_restore)
+module Backups
+  module Automate
+    module GenericObject
+      module Methods
+        module Redhat
+          class RestoreVmFromBackup
+            def initialize(handle = $evm)
+              @handle = handle
+              @backup = @handle.vmdb(:GenericObject).find(@handle.root['backup_id'])
+              @backup_service = @backup.service.first
+              @backup_vm = @handle.vmdb(:VmOrTemplate).find_by!(name: JSON.parse(@backup.configuration)['vm_name'])
+            end
+
+            def main
+              exit MIQ_OK if active_backups_count(@backup_service).positive?
+
+              @handle.log(:info, "Start restoring #{@backup_vm.name} VM " \
+                                 "from backup #{@backup.name} in service #{@backup_service.name}")
+              lock_other_service_backups(@backup_service)
+              restore_vm_from_backup
+              @handle.log(:info, 'End restoring')
+            end
+
+            private
+
+            def restore_vm_from_backup
+              new_restore = create_restore_object
+
+              connection = establish_connection(@backup_vm)
+              create_vm_from_template(connection, new_restore)
+            end
+
+            def create_restore_object
+              new_restore = Restore.create_object(restore_params)
+              new_restore.service = [@backup_service]
+              new_restore.backup = [@backup]
+              new_restore.add_to_service(@backup_service)
+              new_restore.save!
+              new_restore
+            end
+
+            def restore_params
+              {
+                name: "rst_#{@backup_vm.name}",
+                status: 'restoring',
+                error: false,
+                original_vm_uuid: @backup_vm.uid_ems,
+                backup_name: @backup.name,
+                new_vm_uuid: nil
+              }
+            end
+          end
+        end
+      end
+    end
+  end
+end
+
+Backups::Automate::GenericObject::Methods::Redhat::RestoreVmFromBackup.new.main

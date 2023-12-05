@@ -5,8 +5,8 @@ object:
   attributes:
     name: GenericObject
     description: ''
-    display_name:
-    priority:
-    enabled:
-    ancestry: '26000000084502'
+    display_name: 
+    priority: 
+    enabled: 
+    ancestry: '26000000000222'
     relative_path: GenericObject
