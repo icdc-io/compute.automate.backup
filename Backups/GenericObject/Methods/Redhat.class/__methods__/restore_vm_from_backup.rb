@@ -24,6 +24,7 @@ module Backups
             private
 
             def restore_vm_from_backup
+              @backup.update!(status: 'restoring')
               new_restore = create_restore_object
 
               connection = establish_connection(@backup_vm)

@@ -2,14 +2,14 @@
 # Description: service_backups method that is used for backup
 #
 
-def active_backups_count(service) # TODO: make for one vm
+def active_backups_count(service)
   backups_in_processing = []
 
-  service.generic_objects.each do |generic_object|
-    next if not_terminated_backup?(generic_object) ||
-            (generic_object.status.eql?('ready') || generic_object.status.eql?('error'))
+  service.backups.each do |backup|
+    next if backup.terminated # skip if backup terminated
+    next if backup.status.eql?('ready') || backup.status.eql?('error')
 
-    backups_in_processing.push(generic_object)
+    backups_in_processing.push(backup)
   end
 
   backups_in_processing.length
@@ -24,13 +24,10 @@ def unlock_other_service_backups(service)
 end
 
 def change_service_backup_statuses(service, backup_status, new_backup_status)
-  service.generic_objects.each do |generic_object|
-    next if not_terminated_backup?(generic_object) || !generic_object.status.eql?(backup_status)
+  service.backups.each do |backup|
+    next if backup.terminated
+    next unless backup.status.eql?(backup_status)
 
-    generic_object.update!(status: new_backup_status)
+    backup.update!(status: new_backup_status)
   end
-end
-
-def not_terminated_backup?(generic_object)
-  !generic_object.name.start_with?('bkp_') || generic_object.terminated
 end

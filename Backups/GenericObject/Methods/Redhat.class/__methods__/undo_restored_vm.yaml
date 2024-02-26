@@ -15,5 +15,6 @@ object:
     - "/GenericObject/Libraries/Redhat/connection"
     - "/GenericObject/Libraries/Redhat/constant"
     - "/GenericObject/Libraries/Redhat/vm"
+    - "/GenericObject/Libraries/Redhat/vm_networks"
     relative_path: GenericObject/Methods/Redhat/undo_restored_vm
   inputs: []

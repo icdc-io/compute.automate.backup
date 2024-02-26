@@ -22,7 +22,8 @@ module Backups
               original_vm_id = original_vm.id
               new_vm_id = new_vm.id
 
-              last_restore.update!(status: 'unding_restored_vm')
+              last_restore.update!(status: 'undoing_restored_vm')
+              last_backup.update!(status: 'undoing')
 
               remove_new_vm
               restore_original_vm
@@ -42,10 +43,12 @@ module Backups
               sleep 25
 
               begin
+                remove_dns_records(@backup.service.first, new_vm)
               	connection.system_service.vms_service.vm_service(new_vm.uid_ems).remove
               	new_vm.remove_from_vmdb
               rescue OvirtSDK4::Error
                 sleep 15
+                @handle.log(:info, "Can't remove restored vm. Retrying...")
                 retry
               end
             end

@@ -12,5 +12,7 @@ object:
     embedded_methods:
     - "/GenericObject/Libraries/Redhat/vmdb"
     - "/GenericObject/Libraries/Redhat/connection"
+    - "/GenericObject/Libraries/Redhat/vm_networks"
+    - "/GenericObject/Libraries/Redhat/vm_security_groups"
     relative_path: GenericObject/Libraries/Redhat/vm_configuration
   inputs: []

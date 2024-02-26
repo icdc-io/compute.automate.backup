@@ -55,7 +55,7 @@ def change_vm_configuration(restore)
   final_restoring(restore) if final_restore_needed
 end
 
-def change_vm_networks(restore, _new_vm, original_vm, new_vm_connection, original_vm_connection)
+def change_vm_networks(restore, new_vm, original_vm, new_vm_connection, original_vm_connection)
   count = 0
   final_restore = false
   nics = JSON.parse(restore.backup.first.configuration)['nics']
@@ -90,6 +90,22 @@ def dummy_mac
   (1..6).map { '%0.2X' % rand(256) }.join(':').downcase
 end
 
+def find_vm_ip(vm)
+  vm_name = vm.name
+  vm_ip = ips(vm).first
+
+  # it may need some time to assign ip and hostname values to vm, so we need to wait
+  # there also can be case when after the time has expired, the hostname may not be assigned
+  20.times do
+    break $evm.log(:info, "Vm #{vm_name} ip: '#{vm_ip}'") if vm_ip
+
+    sleep 20
+    $evm.log(:info, "Vm #{vm_name} hasn't got ip. Retrying...")
+    vm.ext_management_system.try(:network_manager)&.refresh
+    vm_ip = ips(vm.reload).first
+  end
+end
+
 def final_restoring(restore)
   new_vm = get_vm_or_template_from_vmdb(restore.new_vm_uuid)
   original_vm = get_vm_or_template_from_vmdb(restore.original_vm_uuid)
@@ -103,7 +119,13 @@ def final_restoring(restore)
   new_vm.group = original_vm.owner.current_group
 
   original_vm.remove_from_service
-
   new_vm.add_to_service(restore.service.first)
+  
+  restore.backup.first.update!(status: 'updating_dns')
+  sleep 20
+  find_vm_ip(new_vm)
+
+  clone_dns_records(restore.service.first, original_vm, new_vm)
+  clone_security_groups(original_vm, new_vm)
   restore.update!(status: 'restored')
 end
