@@ -1,0 +1,165 @@
+---
+custom_button_set:
+- attributes:
+    name: Backups|Service|
+    description: Backups
+    set_type: CustomButtonSet
+    guid: b119f2b1-0dcc-41ea-ba5b-33118886393e
+    read_only: 
+    set_data:
+      :button_order:
+      - 26000000000133
+      - 26000000000132
+      - 26000000000131
+      - 26000000000130
+      :button_icon: ff ff-hexagon
+      :display: true
+      :applies_to_class: Service
+      :group_index: 2
+    mode: 
+    owner_type: 
+    owner_id: 
+    userid: 
+    group_id: 
+  children:
+    custom_button:
+    - attributes:
+        guid: 98aa7d15-2832-4303-bd2c-81117b38967e
+        description: restore_backup
+        applies_to_class: Service
+        visibility_expression: 
+        options:
+          :button_icon: ff ff-hexagon
+          :button_type: default
+          :display: true
+          :open_url: false
+          :display_for: single
+          :submit_how: one
+        userid: admin
+        wait_for_complete: 
+        name: restore_backup
+        visibility:
+          :roles:
+          - _ALL_
+        applies_to_id: 
+        enablement_expression: 
+        disabled_text: 
+      associations:
+        resource_action:
+        - attributes:
+            action: 
+            resource_type: CustomButton
+            ae_namespace: SYSTEM
+            ae_class: PROCESS
+            ae_instance: Request
+            ae_message: create
+            ae_attributes:
+              request: restore_backup
+            configuration_template_id: 
+            configuration_template_type: 
+            dialog_name: Backup
+    - attributes:
+        guid: a6ad6723-5420-4487-a697-c993fc490d0a
+        description: save_backup
+        applies_to_class: Service
+        visibility_expression: 
+        options:
+          :button_icon: ff ff-hexagon
+          :button_type: default
+          :display: true
+          :open_url: false
+          :display_for: single
+          :submit_how: one
+        userid: admin
+        wait_for_complete: 
+        name: save_backup
+        visibility:
+          :roles:
+          - _ALL_
+        applies_to_id: 
+        enablement_expression: 
+        disabled_text: 
+      associations:
+        resource_action:
+        - attributes:
+            action: 
+            resource_type: CustomButton
+            ae_namespace: SYSTEM
+            ae_class: PROCESS
+            ae_instance: Request
+            ae_message: create
+            ae_attributes:
+              request: save_backup
+            configuration_template_id: 
+            configuration_template_type: 
+            dialog_name: Backup
+    - attributes:
+        guid: 02074ff8-64bc-4d42-95e7-d295f987d3ad
+        description: delete_backup
+        applies_to_class: Service
+        visibility_expression: 
+        options:
+          :button_icon: ff ff-hexagon
+          :button_type: default
+          :display: true
+          :open_url: false
+          :display_for: single
+          :submit_how: one
+        userid: admin
+        wait_for_complete: 
+        name: delete_backup
+        visibility:
+          :roles:
+          - _ALL_
+        applies_to_id: 
+        enablement_expression: 
+        disabled_text: 
+      associations:
+        resource_action:
+        - attributes:
+            action: 
+            resource_type: CustomButton
+            ae_namespace: SYSTEM
+            ae_class: PROCESS
+            ae_instance: Request
+            ae_message: create
+            ae_attributes:
+              request: RemoveBackup
+            configuration_template_id: 
+            configuration_template_type: 
+            dialog_name: Backup
+    - attributes:
+        guid: d742af1f-c5dd-4942-97e0-d0f555dc7eb0
+        description: undo_backup
+        applies_to_class: Service
+        visibility_expression: 
+        options:
+          :button_icon: ff ff-hexagon
+          :button_type: default
+          :display: true
+          :open_url: false
+          :display_for: single
+          :submit_how: one
+        userid: admin
+        wait_for_complete: 
+        name: undo_backup
+        visibility:
+          :roles:
+          - _ALL_
+        applies_to_id: 
+        enablement_expression: 
+        disabled_text: 
+      associations:
+        resource_action:
+        - attributes:
+            action: 
+            resource_type: CustomButton
+            ae_namespace: SYSTEM
+            ae_class: PROCESS
+            ae_instance: Request
+            ae_message: create
+            ae_attributes:
+              request: undo_backup
+            configuration_template_id: 
+            configuration_template_type: 
+            dialog_name: Backup
