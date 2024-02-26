@@ -10,4 +10,4 @@ object:
     relative_path: GenericObject/Libraries/Redhat/vm_created
   fields:
   - vm_created:
-      value: " vm_created"
+      value: vm_created

@@ -23,6 +23,7 @@ module Backups
               new_vm_id = new_vm.id
 
               last_restore.update!(status: 'saving_restored_vm')
+              last_backup.update!(status: 'saving')
 
               remove_original_vm
               save_new_vm
@@ -42,10 +43,12 @@ module Backups
               sleep 25
 
               begin
+                remove_dns_records(@backup.service.first, original_vm)
               	connection.system_service.vms_service.vm_service(original_vm.uid_ems).remove
               	original_vm.remove_from_vmdb
               rescue OvirtSDK4::Error
                 sleep 15
+                @handle.log(:info, "Can't remove original vm. Retrying...")
                 retry
               end
             end
@@ -57,7 +60,8 @@ module Backups
               begin
                 connection.system_service.vms_service.vm_service(new_vm.uid_ems).update(name: new_vm_name)
               rescue OvirtSDK4::Error
-                sleep 15 # TODO: maybe this is error?
+                sleep 15
+                @handle.log(:info, "Can't update new wm name. Retrying...")
                 retry
               end
             end
