@@ -18,7 +18,3 @@ def find_storage_for_recovery(disk_type)
   free_disks = (disks - storage_domains).select { |disk| disk.storage_domain_type == 'data' }
   free_disks.max_by(&:free_space).ems_ref.split('/').last
 end
-
-def replace_name_to_filename(disk_name, template)
-  template.hardware.disks.find { |disk| disk if disk.device_name == disk_name }.filename
-end
