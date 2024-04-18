@@ -18,27 +18,31 @@ module Backups
             private
 
             def clearing_after_backup
-              if /^Creation of Template (bkp_.+) from VM/.match?(@event.message)
-                template_uuid = @event.full_data['template']['id']
-              end
-
-              template = get_vm_or_template_from_vmdb(template_uuid)
-              exit MIQ_OK unless template
+              return unless /^Creation of Template (bkp_.+) from VM/.match?(@event.message)
+              
+              template_uuid = @event.full_data.dig('template', 'id')
+              template_name = @event.full_data.dig('template', 'name')
 
               begin
-                backup = Backup.find_objects(name: template.name).first
-                backup.template = [template]
-
-                backup.update!(status: 'created_template', template_id: template.id)
-                backup.update!(status: 'deleting_snapshot')
-
-                @handle.vmdb(:Snapshot).find_by(description: backup.snapshot_uuid).remove
-
-                backup.update!(status: 'deleted_snapshot')
+                backup = Backup.find_objects(name: template_name).first
+                backup.update!(status: 'created_template', template_uuid: template_uuid)
+                delete_snapshot(backup)
                 backup.update!(status: 'ready')
-              rescue StandardError
+              rescue StandardError => error
                 backup.update!(error: true)
+                @handle.log(:error, error.message)
               end
+            end
+            
+            def delete_snapshot(backup)
+              backup.update!(status: 'deleting_snapshot')
+              vm = @handle.vmdb(:VmOrTemplate).find_by(name: JSON.parse(backup.configuration)['vm_name'])
+              connection = establish_connection(vm)
+              connection.system_service.vms_service.vm_service(vm.uid_ems).snapshots_service.snapshot_service(backup.snapshot_uuid).remove
+              backup.update!(status: 'deleted_snapshot')
+            rescue => error
+              backup.update!(error: true)
+              @handle.log(:error, error.message)
             end
           end
         end
