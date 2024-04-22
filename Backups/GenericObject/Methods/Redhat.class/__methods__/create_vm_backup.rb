@@ -37,7 +37,7 @@ module Backups
 
             def vm_backup_params(vm)
               {
-                name: "bkp_#{vm.id}_#{Time.now.strftime('%Y%m%d-%H%M')}", # rubocop:disable Rails/TimeZone
+                name: "bkp_#{ENV.fetch('LOC_NAME')}_#{vm.id}_#{Time.now.strftime('%Y%m%d-%H%M')}", # rubocop:disable Rails/TimeZone
                 status: 'not_started',
                 error: false,
                 snapshot_uuid: nil,
