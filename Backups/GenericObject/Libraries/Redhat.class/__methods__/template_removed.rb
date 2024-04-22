@@ -18,7 +18,7 @@ module Backups
             private
 
             def template_removed
-              rematch = @event_msg.match(/^Removal of Template (bkp_.+) has been completed./)
+              rematch = @event_msg.match(/^Removal of Template (bkp_#{ENV.fetch('LOC_NAME')}_.+) has been completed./)
               template_name = rematch[1] if rematch
               return unless template_name
 

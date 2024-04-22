@@ -18,7 +18,7 @@ module Backups
             private
 
             def clearing_after_backup
-              return unless /^Creation of Template (bkp_.+) from VM/.match?(@event.message)
+              return unless /^Creation of Template (bkp_#{ENV.fetch('LOC_NAME')}_.+) from VM/.match?(@event.message)
               
               template_uuid = @event.full_data.dig('template', 'id')
               template_name = @event.full_data.dig('template', 'name')
