@@ -42,7 +42,7 @@ module Backups
 
             def restore_params
               {
-                name: "rst_#{@backup_vm.name}",
+                name: "rst_#{ENV.fetch('LOC_NAME')}_#{@backup_vm.name}",
                 status: 'restoring',
                 error: false,
                 original_vm_uuid: @backup_vm.uid_ems,
