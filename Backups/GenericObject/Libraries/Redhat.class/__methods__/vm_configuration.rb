@@ -70,7 +70,11 @@ def change_vm_networks(restore, original_vm, new_vm_connection, original_vm_conn
     10.times do
       original_vm_nics.nic_service(original_nic_uid).update(mac: { address: dummy_mac }) # set temporary mac
       break
-    rescue
+    rescue => error
+      $evm.log(:error, "Error setting dummy mac:")
+      $evm.log(:error, error.message)
+      exit MIQ_ERROR unless error.message =~ /4\d\d/
+      $evm.log(:error, "Trying another mac.")
     end
     
     new_vm_nics.nic_service(nic.id).update(mac: { address: original_mac })
