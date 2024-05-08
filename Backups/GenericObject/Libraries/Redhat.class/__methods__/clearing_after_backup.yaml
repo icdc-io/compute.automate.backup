@@ -12,5 +12,6 @@ object:
     embedded_methods:
     - "/GenericObject/Libraries/Redhat/vmdb"
     - "/GenericObject/Libraries/Redhat/constant"
+    - "/GenericObject/Libraries/Redhat/connection"
     relative_path: GenericObject/Libraries/Redhat/clearing_after_backup
   inputs: []
