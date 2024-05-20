@@ -100,9 +100,9 @@ def cpv_domain
 end
 
 def ips(vm)
-  vm.hardware.nics
-    .filter_map { |nic| $evm.vmdb(:NetworkPort).find_by(device_id: nic.id) }
-    .collect(&:ipaddresses).flatten.compact
+  nics = vm&.hardware&.nics || []
+  nics.filter_map { |nic| $evm.vmdb(:NetworkPort).find_by(device_id: nic.id)&.ipaddresses}
+      .flatten.compact
 end
 
 def account_zones

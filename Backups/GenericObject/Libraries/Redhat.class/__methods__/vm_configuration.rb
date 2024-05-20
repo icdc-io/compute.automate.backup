@@ -107,13 +107,14 @@ def find_vm_ip(vm)
 end
 
 def final_restoring(restore)
-  new_vm = get_vm_or_template_from_vmdb(restore.new_vm_uuid)
   original_vm = get_vm_or_template_from_vmdb(restore.original_vm_uuid)
+  
+  connection = establish_connection(original_vm)
+  connect_to_vm_service(connection, restore.original_vm_uuid).stop
+  connect_to_vm_service(connection, restore.new_vm_uuid).start
 
-  connection = establish_connection(new_vm)
-  connect_to_vm_service(connection, new_vm.uid_ems).start
-  connect_to_vm_service(connection, original_vm.uid_ems).stop
-
+  new_vm = $evm.vmdb(:Vm).find(original_vm.copy_for_backup(restore))
+  
   new_vm.tags.push(original_vm.tags)
   new_vm.owner = original_vm.owner
   new_vm.group = original_vm.owner.current_group
