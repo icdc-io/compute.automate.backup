@@ -112,7 +112,7 @@ def final_restoring(restore)
   connection = establish_connection(original_vm)
   connect_to_vm_service(connection, restore.original_vm_uuid).stop
   connect_to_vm_service(connection, restore.new_vm_uuid).start
-
+  
   new_vm = $evm.vmdb(:Vm).find(original_vm.copy_for_backup(restore))
   
   new_vm.tags.push(original_vm.tags)
@@ -128,5 +128,22 @@ def final_restoring(restore)
 
   clone_dns_records(restore.service.first, original_vm, new_vm)
   clone_security_groups(original_vm, new_vm)
+  
   restore.update!(status: 'restored')
+rescue => e
+  $evm.log(:error, e.message)
+  new_vm&.remove_from_service
+  new_vm_connection = connect_to_vm_service(connection, restore.new_vm_uuid)
+  new_vm_connection.stop
+  5.times do
+    status = new_vm_connection.get.status
+    break if !status || status == 'down'
+    sleep 3
+  end
+  new_vm_connection.remove
+  original_vm.add_to_service(restore.service.first) unless original_vm.service
+  connect_to_vm_service(connection, restore.original_vm_uuid).start
+  restore.backup.first.update!(status: 'ready')
+  restore.update!(error: true, status: 'error')
+  exit MIQ_ABORT
 end
