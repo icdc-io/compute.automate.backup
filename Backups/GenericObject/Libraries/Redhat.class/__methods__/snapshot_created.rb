@@ -22,7 +22,6 @@ module Backups
               exit MIQ_OK unless rematch
 
               snapshot_uuid = rematch[1]
-              $evm.log(:info, "Snapshot uuid: #{snapshot_uuid}")
               backup = Backup.find_objects(snapshot_uuid: snapshot_uuid).first
               exit MIQ_OK unless backup
 
