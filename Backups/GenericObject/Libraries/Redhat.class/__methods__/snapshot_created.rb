@@ -26,20 +26,17 @@ module Backups
               exit MIQ_OK unless backup
 
               begin
-                # snapshot = get_snapshot_from_vmdb(snapshot_uuid)
-
                 backup.update!(status: 'created_snapshot') # For future, mb we need also one step in creation backup
                 backup.update!(status: 'creating_template')
 
                 vm = @handle.vmdb(:VmOrTemplate).find_by(name: JSON.parse(backup.configuration)['vm_name'])
                 connection = establish_connection(vm)
-                # ahrechushkin: hot fix just for tests
-                # create_template(connection, snapshot, backup)
                 s = connection.system_service.vms_service.vm_service(vm.uid_ems).snapshots_service.list.find { |x| x.description == snapshot_uuid }
                 backup.update!(snapshot_uuid: s.id)
                 snapshot_id = s.id
                 create_template_new(connection, snapshot_id, backup)
-              rescue StandardError
+              rescue StandardError => e
+                $evm.log(:error, e.message)
                 backup.update!(error: true)
                 exit MIQ_ABORT
               end
