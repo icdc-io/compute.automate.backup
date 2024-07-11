@@ -21,7 +21,7 @@ module Backups
               uid = @event.full_data['vm']['id']
               event_msg = @event.message
 
-              rematch = event_msg.match(/^VM (rst_#{ENV.fetch('LOC_NAME')}_.+) creation has been completed./) # || event_msg.match(/^VM (dev_.+) creation has been completed./)
+              rematch = event_msg.match(/^VM (rst_#{ENV.fetch('LOCATION_NAME')}_.+) creation has been completed./) # || event_msg.match(/^VM (dev_.+) creation has been completed./)
               vm_name = rematch[1] if rematch
               exit MIQ_ERROR unless vm_name
 
