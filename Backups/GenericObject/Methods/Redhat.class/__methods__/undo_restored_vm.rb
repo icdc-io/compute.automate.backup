@@ -25,6 +25,7 @@ module Backups
               last_restore.update!(status: 'undoing_restored_vm')
               last_backup.update!(status: 'undoing')
 
+              change_mac_addresses
               remove_new_vm
               restore_original_vm
 
@@ -33,6 +34,18 @@ module Backups
 
               unlock_other_service_backups(last_restore.service.first)
               update_vm_backup_schedules(original_vm_id, new_vm_id)
+            end
+
+            def change_mac_addresses
+              connection = establish_connection(original_vm)
+              new_vm_connection = connect_to_vm_service(connection, last_restore.new_vm_uuid)
+              original_vm_connection = connect_to_vm_service(connection, last_restore.original_vm_uuid)
+
+              new_vm_connection.shutdown
+              original_vm_connection.shutdown
+
+              sleep 10
+              change_vm_networks(last_restore, new_vm, original_vm_connection, new_vm_connection)
             end
 
             def remove_new_vm
@@ -55,6 +68,10 @@ module Backups
 
             def restore_original_vm
               original_vm.add_to_service(last_restore.service.first)
+              connection = establish_connection(original_vm)
+              original_vm.ext_management_system.try(:network_manager)&.refresh
+              sleep 25
+              connect_to_vm_service(connection, last_restore.original_vm_uuid).start
             end
 
             def last_restore
