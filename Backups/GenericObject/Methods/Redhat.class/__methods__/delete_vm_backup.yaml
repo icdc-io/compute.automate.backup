@@ -13,5 +13,8 @@ object:
     - "/GenericObject/Libraries/Redhat/templates"
     - "/GenericObject/Libraries/Redhat/connection"
     - "/GenericObject/Libraries/Redhat/vm"
+    - "/GenericObject/Libraries/Redhat/constant"
+    - "/GenericObject/Libraries/Redhat/vmdb"
+    - "/GenericObject/Libraries/Redhat/vm_networks"
     relative_path: GenericObject/Methods/Redhat/delete_vm_backup
   inputs: []
