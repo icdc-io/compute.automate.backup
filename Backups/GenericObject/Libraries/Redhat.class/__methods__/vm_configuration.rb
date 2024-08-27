@@ -108,27 +108,31 @@ end
 
 def final_restoring(restore)
   original_vm = get_vm_or_template_from_vmdb(restore.original_vm_uuid)
-  
+
   connection = establish_connection(original_vm)
-  connect_to_vm_service(connection, restore.original_vm_uuid).stop
   connect_to_vm_service(connection, restore.new_vm_uuid).start
-  
+
+  connect_to_vm_service(connection, restore.original_vm_uuid).start
+  original_vm.ext_management_system.try(:network_manager)&.refresh
+  connect_to_vm_service(connection, restore.original_vm_uuid).stop
+
   new_vm = $evm.vmdb(:Vm).find(original_vm.copy_for_backup(restore))
-  
+
   new_vm.tags.push(original_vm.tags)
   new_vm.owner = original_vm.owner
   new_vm.group = original_vm.owner.current_group
 
   original_vm.remove_from_service
   new_vm.add_to_service(restore.service.first)
-  
+
   restore.backup.first.update!(status: 'updating_dns')
   sleep 20
   find_vm_ip(new_vm)
 
   clone_dns_records(restore.service.first, original_vm, new_vm)
   clone_security_groups(original_vm, new_vm)
-  
+
+  new_vm.ext_management_system.try(:network_manager)&.refresh
   restore.update!(status: 'restored')
 rescue => e
   $evm.log(:error, e.message)
