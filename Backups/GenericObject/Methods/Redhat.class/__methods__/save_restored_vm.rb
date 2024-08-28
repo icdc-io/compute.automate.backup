@@ -10,6 +10,8 @@ module Backups
             end
 
             def main
+              return unless @backup.status == 'restored'
+              
               @handle.log(:info, "Saving restored VM from backup #{@backup.name} " \
                                  "in service #{@backup.service.first.name}")
               save_restored_vm
