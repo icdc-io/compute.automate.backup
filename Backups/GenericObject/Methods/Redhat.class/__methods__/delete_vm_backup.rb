@@ -21,22 +21,21 @@ module Backups
 
             def delete_vm_backup
               return if backup_template_orphaned_or_archived?
-
+              
+              unless last_restore.status.in? ['save_restored_vm', 'undo_restored_vm']
+                original_vm = get_vm_or_template_from_vmdb(last_restore.original_vm_uuid)
+                remove_vm(original_vm)
+              end
+              
               remove_template_request
             end
 
             def backup_template_orphaned_or_archived?
-              is_archived = check_archived(backup_template.uid_ems)
-              is_orphaned = check_orphaned(backup_template.uid_ems)
-              is_archived || is_orphaned
+              check_archived(backup_template.uid_ems) || check_orphaned(backup_template.uid_ems)
             end
 
             def backup_template
-              @backup_template ||= if @backup.template_id.nil?
-                                     find_backup_template(name: @backup.name)
-                                   else
-                                     find_backup_template(id: @backup.template_id)
-                                   end
+              @backup_template ||= find_backup_template(@backup.template_id.nil? ? {name: @backup.name} : {id: @backup.template_id})
             end
 
             def find_backup_template(params = {})
@@ -53,6 +52,28 @@ module Backups
               remove_template(connection, backup_template.uid_ems, @backup)
             rescue StandardError => e
               @handle.log(:error, "Attempt to remove template #{e.message}")
+            end
+            
+            def last_restore
+              @last_restore ||= Restore.find_objects(backup_name: @backup.name).max_by(&:created_at)
+            end
+            
+            def remove_vm(vm)
+              return unless vm
+
+              connection = establish_connection(vm)
+              connection.system_service.vms_service.vm_service(vm.uid_ems).shutdown
+              sleep 25
+
+              begin
+                remove_dns_records(@backup.service.first, vm)
+              	connection.system_service.vms_service.vm_service(vm.uid_ems).remove
+              	vm.remove_from_vmdb
+              rescue OvirtSDK4::Error
+                sleep 15
+                @handle.log(:info, "Can't remove original vm. Retrying...")
+                retry
+              end
             end
           end
         end
