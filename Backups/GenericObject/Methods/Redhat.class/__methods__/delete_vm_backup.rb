@@ -22,7 +22,7 @@ module Backups
             def delete_vm_backup
               return if backup_template_orphaned_or_archived?
               
-              unless last_restore.status.in? ['save_restored_vm', 'undo_restored_vm']
+              if last_restore && !last_restore.status.in? ['save_restored_vm', 'undo_restored_vm']
                 original_vm = get_vm_or_template_from_vmdb(last_restore.original_vm_uuid)
                 remove_vm(original_vm)
               end
