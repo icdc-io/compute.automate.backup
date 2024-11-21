@@ -30,7 +30,25 @@ module Backups
               @handle.log(:info, 'in restore branch')
               restore = Restore.find_objects(name: vm_name).max_by(&:created_at)
               restore.update!(status: 'vm_created', new_vm_uuid: uid)
-              change_vm_configuration(restore)
+              
+              $evm.log(:info, "[restore backup] save original disk_map #{restore.original_vm_uuid}")
+              restore.update!(original_disks_map: disks_map(restore.original_vm_uuid))
+              
+              $evm.log(:info, "[restore backup] save backup disk_map #{restore.new_vm_uuid}")
+              restore.update!(backup_disks_map: disks_map(restore.new_vm_uuid))
+              
+              $evm.log(:info, "[restore backup] disconnect disks #{restore.original_vm_uuid}")
+              disconnect_disks(restore.original_vm_uuid)
+              
+              $evm.log(:info, "[restore backup] disconnect disks #{restore.new_vm_uuid}")
+              disconnect_disks(restore.new_vm_uuid)              
+
+			  $evm.log(:info, "[restore backup] connect disks #{restore.original_vm_uuid}")
+              connect_disks(restore.backup_disks_map, restore.original_vm_uuid)
+              
+			  $evm.log(:info, "[restore backup] connect disks #{restore.new_vm_uuid}")
+              connect_disks(restore.original_disks_map, restore.new_vm_uuid)
+                            
               restore.backup.first.update!(status: 'restored')
             end
           end

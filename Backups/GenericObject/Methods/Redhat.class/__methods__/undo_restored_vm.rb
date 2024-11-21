@@ -1,3 +1,5 @@
+require 'ovirtsdk4'
+
 module Backups
   module Automate
     module GenericObject
@@ -19,59 +21,39 @@ module Backups
             private
 
             def undo_restored_vm
-              original_vm_id = original_vm.id
-              new_vm_id = new_vm.id
-
               last_restore.update!(status: 'undoing_restored_vm')
               last_backup.update!(status: 'undoing')
-
-              change_mac_addresses
-              remove_new_vm
-              restore_original_vm
+              
+              # 1. shutdown vms
+              # 2. detach disks
+              # 3. swtich disks between vms
+              # 4. remove new vm
+              shutdown_vm(last_restore.original_vm_uuid)
+              shutdown_vm(last_restore.new_vm_uuid)
+              
+              disconnect_disks(last_restore.original_vm_uuid)
+              disconnect_disks(last_restore.new_vm_uuid)
+              
+              connect_disks(last_restore.original_disks_map, last_restore.original_vm_uuid)
+              connect_disks(last_restore.backup_disks_map, last_restore.new_vm_uuid)
+              
+              remove_vm(last_restore.new_vm_uuid)
 
               last_restore.update!(status: 'undo_restored_vm')
               last_backup.update!(status: 'ready')
 
               unlock_other_service_backups(last_restore.service.first)
-              update_vm_backup_schedules(original_vm_id, new_vm_id)
             end
-
-            def change_mac_addresses
-              connection = establish_connection(original_vm)
-              new_vm_connection = connect_to_vm_service(connection, last_restore.new_vm_uuid)
-              original_vm_connection = connect_to_vm_service(connection, last_restore.original_vm_uuid)
-
-              new_vm_connection.shutdown
-              original_vm_connection.shutdown
-
-              sleep 10
-              change_vm_networks(last_restore, new_vm, original_vm_connection, new_vm_connection)
+            
+            def shutdown_vm(vm_uid)
+              connection = $evm.vmdb(:VmOrTemplate).find_by(uid_ems: vm_uid).ext_management_system.connect
+              connection.system_service.vms_service.vm_service(vm_uid).shutdown
+              sleep(10)
             end
-
-            def remove_new_vm
-              return unless new_vm
-
-              connection = establish_connection(new_vm)
-              connection.system_service.vms_service.vm_service(new_vm.uid_ems).shutdown
-              sleep 25
-
-              begin
-                remove_dns_records(@backup.service.first, new_vm)
-              	connection.system_service.vms_service.vm_service(new_vm.uid_ems).remove
-              	new_vm.remove_from_vmdb
-              rescue OvirtSDK4::Error
-                sleep 15
-                @handle.log(:info, "Can't remove restored vm. Retrying...")
-                retry
-              end
-            end
-
-            def restore_original_vm
-              original_vm.add_to_service(last_restore.service.first)
-              connection = establish_connection(original_vm)
-              original_vm.ext_management_system.try(:network_manager)&.refresh
-              sleep 25
-              connect_to_vm_service(connection, last_restore.original_vm_uuid).start
+            
+            def remove_vm(vm_uid)
+			  connection = $evm.vmdb(:VmOrTemplate).find_by(uid_ems: vm_uid).ext_management_system.connect
+              connection.system_service.vms_service.vm_service(vm_uid).remove
             end
 
             def last_restore
@@ -80,14 +62,6 @@ module Backups
 
             def last_backup
               @last_backup ||= last_restore.backup.first
-            end
-
-            def new_vm
-              @new_vm ||= get_vm_or_template_from_vmdb(last_restore.new_vm_uuid)
-            end
-
-            def original_vm
-              @original_vm ||= get_vm_or_template_from_vmdb(last_restore.original_vm_uuid)
             end
           end
         end

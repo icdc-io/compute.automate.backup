@@ -10,11 +10,7 @@ object:
     language: ruby
     location: inline
     embedded_methods:
-    - "/GenericObject/Libraries/Redhat/service_backups"
-    - "/GenericObject/Libraries/Redhat/vmdb"
-    - "/GenericObject/Libraries/Redhat/connection"
     - "/GenericObject/Libraries/Redhat/constant"
-    - "/GenericObject/Libraries/Redhat/vm"
-    - "/GenericObject/Libraries/Redhat/vm_networks"
+    - "/GenericObject/Libraries/Redhat/service_backups"
     relative_path: GenericObject/Methods/Redhat/save_restored_vm
   inputs: []

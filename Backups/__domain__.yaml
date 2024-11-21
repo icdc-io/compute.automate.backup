@@ -6,9 +6,9 @@ object:
     name: Backups
     description: ''
     display_name: 
-    priority: 2
+    priority: 3
     enabled: true
-    tenant_id: 26000000000001
+    tenant_id: 21000000000001
     source: user
     top_level_namespace: 
     ancestry: 

@@ -21,67 +21,25 @@ module Backups
             private
 
             def save_restored_vm
-              original_vm_id = original_vm.id
-              new_vm_id = new_vm.id
-
               last_restore.update!(status: 'saving_restored_vm')
-              last_backup.update!(status: 'saving')
+              @backup.update!(status: 'saving')
 
-              remove_original_vm
-              save_new_vm
+			  api = connection(last_restore.new_vm_uuid)
+              api.vms_service.vm_service(last_restore.new_vm_uuid).remove
 
               last_restore.update!(status: 'save_restored_vm')
-              last_backup.update!(status: 'ready')
+              @backup.update!(status: 'ready')
 
-              unlock_other_service_backups(last_backup.service.first)
-              update_vm_backup_schedules(new_vm_id, original_vm_id)
+              unlock_other_service_backups(@backup.service.first)
             end
-
-            def remove_original_vm
-              return unless original_vm
-
-              connection = establish_connection(original_vm)
-              connection.system_service.vms_service.vm_service(original_vm.uid_ems).shutdown
-              sleep 25
-
-              begin
-                remove_dns_records(@backup.service.first, original_vm)
-              	connection.system_service.vms_service.vm_service(original_vm.uid_ems).remove
-              	original_vm.remove_from_vmdb
-              rescue OvirtSDK4::Error
-                sleep 15
-                @handle.log(:info, "Can't remove original vm. Retrying...")
-                retry
-              end
-            end
-
-            def save_new_vm
-              new_vm_name = JSON.parse(last_backup.configuration)['vm_name']
-              connection = establish_connection(new_vm)
-
-              begin
-                connection.system_service.vms_service.vm_service(new_vm.uid_ems).update(name: new_vm_name)
-              rescue OvirtSDK4::Error
-                sleep 15
-                @handle.log(:info, "Can't update new wm name. Retrying...")
-                retry
-              end
-            end
-
+            
+                        
             def last_restore
               @last_restore ||= Restore.find_objects(backup_name: @backup.name).max_by(&:created_at)
             end
-
-            def last_backup
-              @last_backup ||= last_restore.backup.first
-            end
-
-            def new_vm
-              @new_vm ||= get_vm_or_template_from_vmdb(last_restore.new_vm_uuid)
-            end
             
-            def original_vm
-              @original_vm ||= get_vm_or_template_from_vmdb(last_restore.original_vm_uuid)
+            def connection(vm_uid)
+              $evm.vmdb(:VmOrTemplate).find_by(uid_ems: vm_uid).ext_management_system.connect.system_service
             end
           end
         end
