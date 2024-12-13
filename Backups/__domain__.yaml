@@ -6,7 +6,7 @@ object:
     name: Backups
     description: ''
     display_name: 
-    priority: 3
+    priority: 5
     enabled: true
     tenant_id: 21000000000001
     source: user

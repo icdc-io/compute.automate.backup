@@ -23,8 +23,8 @@ module Backups
               return if backup_template_orphaned_or_archived?
               
               if last_restore && !last_restore.status.in?(['save_restored_vm', 'undo_restored_vm'])
-                original_vm = get_vm_or_template_from_vmdb(last_restore.original_vm_uuid)
-                remove_vm(original_vm)
+                new_vm = get_vm_or_template_from_vmdb(last_restore.new_vm_uuid)
+                remove_vm(new_vm)
               end
               
               remove_template_request
