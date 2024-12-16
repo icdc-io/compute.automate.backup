@@ -23,8 +23,12 @@ module Backups
               return if backup_template_orphaned_or_archived?
               
               if last_restore && !last_restore.status.in?(['save_restored_vm', 'undo_restored_vm'])
-                new_vm = get_vm_or_template_from_vmdb(last_restore.new_vm_uuid)
-                remove_vm(new_vm)
+                restore_vms = [last_restore.new_vm_uuid, last_restore.original_vm_uuid] - @backup.service.first.vms.pluck(:uid_ems)
+                restore_vms.each do |vm_uuid|
+                  @handle.log(:info, "Rmoving vm: \"#{vm_uuid}\"")
+                  vm = get_vm_or_template_from_vmdb(vm_uuid)
+                  remove_vm(vm)
+                end
               end
               
               remove_template_request

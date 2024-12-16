@@ -518,11 +518,11 @@ Backups/GenericObject/Methods/Redhat.class/__methods__/delete_vm_backup.rb:
     zone: *2
     time: *114
   updated_on: &117 !ruby/object:ActiveSupport::TimeWithZone
-    utc: &115 2024-12-12 09:03:10.374283000 Z
+    utc: &115 2024-12-16 07:40:29.882010000 Z
     zone: *2
     time: *115
-  size: 2957
-  sha1: uodGwNlsySKwKs38f9oDM4E4Lg0=
+  size: 3201
+  sha1: bb+BbnUDWm4kynVe5aZUfPpYzSI=
 Backups/GenericObject/Methods/Redhat.class/__methods__/delete_vm_backup.yaml:
   created_on: *116
   updated_on: *117
