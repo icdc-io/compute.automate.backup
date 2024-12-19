@@ -13,7 +13,7 @@ def disks_map(vm_uid)
 
 	{
       bootable: da.bootable,
-      interface: 'virtio_scsi',
+      interface: da.interface || 'virtio_scsi',
       active: true,
       disk: {
         id: da.disk.id,
