@@ -12,5 +12,6 @@ object:
     embedded_methods:
     - "/GenericObject/Libraries/Redhat/constant"
     - "/GenericObject/Libraries/Redhat/vm_configuration"
+    - "/GenericObject/Libraries/Redhat/disks_configuration"
     relative_path: GenericObject/Libraries/Redhat/vm_created
   inputs: []

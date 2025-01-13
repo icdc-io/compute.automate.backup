@@ -10,6 +10,8 @@
         original_vm_uuid: :string
         new_vm_uuid: :string
         backup_name: :string
+        original_disks_map: :string
+        backup_disks_map: :string
       :associations:
         service: Service
         backup: GenericObject
