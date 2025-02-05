@@ -184,7 +184,7 @@ Backups/GenericObject/Libraries/Redhat.class/__methods__/constant.yaml:
   updated_on: *37
   size: 247
   sha1: kzgVnvVFhb/PEm9pA/8hugmCL24=
-Backups/GenericObject/Libraries/Redhat.class/__methods__/service_backups.rb:
+Backups/GenericObject/Libraries/Redhat.class/__methods__/disks_configuration.rb:
   created_on: &40 !ruby/object:ActiveSupport::TimeWithZone
     utc: &38 2024-11-19 10:12:50.824660000 Z
     zone: *2
@@ -193,9 +193,9 @@ Backups/GenericObject/Libraries/Redhat.class/__methods__/service_backups.rb:
     utc: &39 2024-11-19 10:12:50.824660000 Z
     zone: *2
     time: *39
-  size: 842
-  sha1: OCSaxXJ2TQuxHgu0ODTEsgJ/vJw=
-Backups/GenericObject/Libraries/Redhat.class/__methods__/service_backups.yaml:
+  size: 1522
+  sha1: QUb14+QTfplIb43ONzAhYGPYgvA=
+Backups/GenericObject/Libraries/Redhat.class/__methods__/disks_configuration.yaml:
   created_on: *40
   updated_on: *41
   size: 261

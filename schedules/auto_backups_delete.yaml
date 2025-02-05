@@ -1,0 +1,27 @@
+---
+- MiqSchedule:
+    name: auto_backups_delete
+    description: auto_backups_delete
+    sched_action:
+      :method: delete_backups
+    filter: !ruby/object:MiqExpression
+      exp:
+        IS NOT NULL:
+          field: MiqTemplate-name
+      context_type:
+    resource_type: Service
+    run_at:
+      :tz: Minsk
+      :start_time: 2024-04-16 21:00:00.000000000 Z
+      :interval:
+        :unit: daily
+        :value: '1'
+    enabled: true
+    userid: admin
+    prod_default:
+    miq_search_id:
+    adhoc:
+    file_depot_id:
+    schedulable_id:
+    schedulable_type:
+    resource_id:
