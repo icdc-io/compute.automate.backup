@@ -1,58 +1,5 @@
 require 'ovirtsdk4'
 
-def create_template_clone(connection, snapshot, vm_id)
-  vm = $evm.vmdb(:Vm).find(vm_id)
-  vm_name = "cld_cl-#{snapshot.name.slice('clone-')}"
-
-  h = {
-    name: vm_name,
-    cluster: {
-      name: vm.ems_cluster.name
-    },
-    disk_attachments: vm.disks.map do |vm_disk|
-      {
-        disk: {
-          id: vm_disk.filename,
-          storage_domains: [{
-            id: vm.storage.ems_ref.split('/').last
-          }]
-        }
-      }
-    end,
-    snapshots: [{
-      id: snapshot.uid_ems
-    }]
-  }
-
-  connection.system_service.vms_service.add_from_snapshot(OvirtSDK4::Vm.new(h))
-end
-
-def create_template(connection, snapshot, backup)
-  vm = $evm.vmdb(:Vm).find_by!(name: JSON.parse(backup.configuration)['vm_name'])
-
-  h = {
-    name: backup.name,
-    vm: {
-      id: vm.uid_ems,
-      snapshots: [{
-        id: snapshot.uid_ems
-      }],
-      disk_attachments: vm.disks.map do |vm_disk|
-        {
-          disk: {
-            id: vm_disk.filename,
-            storage_domains: [{
-              id: find_backup_storage
-            }]
-          }
-        }
-      end
-    }
-  }
-
-  connection.system_service.templates_service.add_from_vm_snapshot(OvirtSDK4::Template.new(h))
-end
-
 def create_template_new(connection, snapshot_id, backup)
   vm = $evm.vmdb(:Vm).find_by!(name: JSON.parse(backup.configuration)['vm_name'])
 
