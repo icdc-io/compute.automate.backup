@@ -47,7 +47,7 @@ module Backups
             
             def remove_vm(vm_uid)
               $evm.log(:info, "[Undo backup] remove backup vm #{vm_uid}")
-			  connection = $evm.vmdb(:VmOrTemplate).find_by(uid_ems: vm_uid).ext_management_system.connect
+			        connection = $evm.vmdb(:VmOrTemplate).find_by(uid_ems: vm_uid).ext_management_system.connect
               connection.system_service.vms_service.vm_service(vm_uid).remove
             end
 
@@ -81,7 +81,7 @@ module Backups
               
               if retry_needed
                 $evm.root['ae_result']         = 'retry'
-				$evm.root['ae_retry_interval'] = '1.minute'
+				        $evm.root['ae_retry_interval'] = '1.minute'
                 exit MIQ_OK
               end
             end
