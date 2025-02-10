@@ -41,7 +41,6 @@ module Backups
                 status: 'not_started',
                 error: false,
                 snapshot_uuid: nil,
-                template_id: nil,
                 terminated: false,
                 configuration: vm_configuration(vm).to_json,
                 description: vm_backup_description(vm)

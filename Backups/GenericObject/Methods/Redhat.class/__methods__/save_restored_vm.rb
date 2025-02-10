@@ -24,7 +24,7 @@ module Backups
               last_restore.update!(status: 'saving_restored_vm')
               @backup.update!(status: 'saving')
 
-			  api = connection(last_restore.new_vm_uuid)
+			        api = connection(last_restore.new_vm_uuid)
               api.vms_service.vm_service(last_restore.new_vm_uuid).remove
 
               last_restore.update!(status: 'save_restored_vm')

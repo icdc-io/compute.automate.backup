@@ -4,24 +4,6 @@
 
 require 'coredns'
 
-def clone_dns_records(service, old_vm, new_vm)
-  @service = service
-
-  ip = ips(new_vm).first
-  raise "Ip address can't be blank" if ip.blank?
-
-  account = @service.tenant.name
-  owner = new_vm.evm_owner.userid
-
-  dns_records(old_vm).each do |dns_record|
-    create_dns_record(ip, account, dns_record['group'], owner)
-  rescue StandardError => e
-    $evm.log(:warn, "Can't create DNS record with ip '#{ip}' in '#{dns_record['group']}' because #{e.message}")
-  end
-rescue StandardError => e
-  $evm.log(:warn, "Can't create DNS records because #{e.message}")
-end
-
 def remove_dns_records(service, vm)
   @service = service
 
