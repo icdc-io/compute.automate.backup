@@ -39,7 +39,7 @@ module Backups
             end
 
             def backup_template
-              @backup_template ||= find_backup_template(@backup.template_id.nil? ? {name: @backup.name} : {id: @backup.template_id})
+              @backup_template ||= find_backup_template({ name: @backup.name })
             end
 
             def find_backup_template(params = {})

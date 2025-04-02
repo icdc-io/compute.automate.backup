@@ -44,10 +44,10 @@ module Backups
               $evm.log(:info, "[vm_created] disconnect disks #{restore.new_vm_uuid}")
               disconnect_disks(restore.new_vm_uuid)              
 
-			  $evm.log(:info, "[vm_created] connect disks from original vm to restored #{restore.original_vm_uuid}")
+			        $evm.log(:info, "[vm_created] connect disks from original vm to restored #{restore.original_vm_uuid}")
               connect_disks(restore.backup_disks_map, restore.original_vm_uuid)
 
-			  $evm.log(:info, "[vm_created] connect disks from restored vm to original #{restore.new_vm_uuid}")
+			        $evm.log(:info, "[vm_created] connect disks from restored vm to original #{restore.new_vm_uuid}")
               connect_disks(restore.original_disks_map, restore.new_vm_uuid)
               restore.backup.first.update!(status: 'restored')
             end
@@ -74,7 +74,7 @@ module Backups
               
               if retry_needed
                 $evm.root['ae_result']         = 'retry'
-				$evm.root['ae_retry_interval'] = '1.minute'
+				        $evm.root['ae_retry_interval'] = '1.minute'
                 exit MIQ_OK
               end
             end
