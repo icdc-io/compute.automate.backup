@@ -65,19 +65,25 @@ module Backups
             def remove_vm(vm)
               return unless vm
 
-              connection = establish_connection(vm)
-              connection.system_service.vms_service.vm_service(vm.uid_ems).shutdown
-              sleep 25
+              remove_dns_records(@backup.service.first, vm)
+              remove_vm_from_ovirt(vm)
+              vm.remove_from_vmdb
+            end
 
+            def remove_vm_from_ovirt(vm)
+              vm_service = establish_connection(vm).system_service.vms_service.vm_service(vm.uid_ems)
+              vm_service.get # raise NotFoundError exception if not found
+              vm_service.stop
+              sleep 25
               begin
-                remove_dns_records(@backup.service.first, vm)
-              	connection.system_service.vms_service.vm_service(vm.uid_ems).remove
-              	vm.remove_from_vmdb
+                vm_service.remove
               rescue OvirtSDK4::Error
                 sleep 15
                 @handle.log(:info, "Can't remove original vm. Retrying...")
                 retry
               end
+            rescue OvirtSDK4::NotFoundError
+              @handle.log(:warn, "Error removing VM from oVirt. VM with uid #{vm.uid_ems} is not found")
             end
           end
         end
