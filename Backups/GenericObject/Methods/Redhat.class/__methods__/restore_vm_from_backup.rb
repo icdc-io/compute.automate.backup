@@ -14,6 +14,17 @@ module Backups
             def main
               exit MIQ_OK if active_backups_count(@backup_service).positive?
 
+              @connection = establish_connection(@backup_vm)
+
+              if @connection.system_service.vms_service.vm_service(@backup_vm.uid_ems).snapshots_service.list.size > 1
+                @handle.create_notification(level:   "error",
+                                            message: "Cannot restore vm: #{@backup_vm.name}. Please, remove vm's snapshots.")
+                @handle.log(:info, "Cannot restore.")
+                @handle.log(:info, "Cannot detach Virtual Disk. The disk is already configured in a snapshot. In order to detach it, remove the disk's snapshots.")
+
+                exit MIQ_OK
+              end
+
               @handle.log(:info, "Start restoring #{@backup_vm.name} VM " \
                                  "from backup #{@backup.name} in service #{@backup_service.name}")
               lock_other_service_backups(@backup_service)
@@ -27,8 +38,7 @@ module Backups
               @backup.update!(status: 'restoring')
               new_restore = create_restore_object
 
-              connection = establish_connection(@backup_vm)
-              create_vm_from_template(connection, new_restore)
+              create_vm_from_template(@connection, new_restore)
             end
 
             def create_restore_object
