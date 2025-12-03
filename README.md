@@ -13,7 +13,7 @@ Automation package `Backups` consists of:
 
 ```bash
 cd /var/www/miq/vmdb
-rake evm:automate:import DOMAIN=Backups IMPORT_DIR=/opt/manageiq/automation/backups OVERWRITE=true ENABLED=true
+rake evm:automate:import DOMAIN=Backups IMPORT_DIR=/opt/manageiq/automation/backups OVERWRITE=true ENABLED=true PREVIEW=false
 ```
 
 
