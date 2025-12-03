@@ -17,6 +17,7 @@ module Platform
             @broken_backups = []
             @resumed_on_snapshot_phase = []
             @resumed_on_template_phase = []
+            @resumed_on_delete_phase = []
           end
 
           def perform
@@ -55,10 +56,12 @@ module Platform
           def analyze_backup(backup)
             @handle.log(:info, "[Backups Watchdog] Analyze backup #{backup.name} (#{backup.id})")
             case backup.status
-            when /snapshot/
+            when /creat.*snapshot/
               fix_snapshot_phase(backup)
-            when /template/
+            when /creat.*template/
               fix_template_phase(backup)
+            when /delet.*template/
+              fix_delete_phase(backup)
             else
               @broken_backups << backup
             end
@@ -106,6 +109,21 @@ module Platform
                                 "#{backup.name}(#{backup.id}) on template phase (#{e.message})")
             @broken_backups << backup
           end
+          
+          def fix_delete_phase(backup, template = nil)
+            template ||= @handle.vmdb(:VmOrTemplate).find_by(name: backup.template_uuid) \
+                      || @handle.vmdb(:VmOrTemplate).find_by(name: backup.name)
+            if template.nil? || template.archived || template.retired
+              retire_backup(backup)
+            else
+              reset_backup(backup)
+            end
+            @resumed_on_delete_phase << backup
+          rescue StandardError => e
+            @handle.log(:error, "[Backups Watchdog] can't resume backup " \
+                                "#{backup.name}(#{backup.id}) on delete phase (#{e.message})")
+            @broken_backups << backup
+          end
 
           def recreate_snapshot(backup)
             vm = $evm.vmdb(:Vm).find_by!(name: JSON.parse(backup.configuration)['vm_name'])
@@ -122,7 +140,17 @@ module Platform
           end
 
           def remove_snapshot(backup)
-            @handle.vmdb(:Snapshot).find_by(uid_ems: backup.snapshot_uuid)&.remove
+            snapshot = @handle.vmdb(:Snapshot).find_by(uid_ems: backup.snapshot_uuid)
+            return unless snapshot
+            # VMs and snapshots are stored indefinitely
+            # so backup can store snapshot_uuid for non-existing VM
+            vm = @handle.vmdb(:Vm).find_by(id: snapshot.vm_or_template_id)
+            if !vm.present? || vm.archived || vm.retired
+              @handle.log(:warn, "[Backups Watchdog] Source VM for snapshot #{snapshot.id} already deleted. Skip removing snapshot")
+              return
+            end
+            # Valid snapshot, remove it
+            snapshot.remove
           end
 
           def reset_backup(backup)
@@ -130,11 +158,18 @@ module Platform
             backup.status = 'ready'
             backup.save!
           end
+          
+          def retire_backup(backup)
+            backup.terminated = true
+            backup.status = 'deleted'
+            backup.save!
+          end
 
           def notify_admins
             return unless @broken_backups.count.positive? ||
                           @resumed_on_template_phase.count.positive? ||
-                          @resumed_on_snapshot_phase.count.positive?
+                          @resumed_on_snapshot_phase.count.positive? ||
+                          @resumed_on_delete_phase.count.positive?
 
             @handle.instantiate('/Configuration/Email/Default')
 
@@ -148,6 +183,7 @@ module Platform
             all_broken_backups = {
               'Resumed on snapshot phase' => @resumed_on_snapshot_phase,
               'Resumed on template phase' => @resumed_on_template_phase,
+              'Resumed on delete phase' => @resumed_on_delete_phase,
               'Broken' => @broken_backups
             }
 
@@ -201,7 +237,7 @@ module Platform
 
           def add_help_link
             help_url = "https://portal.#{ENV.fetch('CPV_DOMAIN')}/services/compute/backups/troubleshoot/backup_problem.html"
-            @message_body += "<p>How to fix broken backups: #{help_url}</p>"
+            @message_body += "<p>Learn more on <a href='#{help_url}'>How to fix broken backups</a></p>"
           end
         end
       end
