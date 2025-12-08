@@ -7,7 +7,8 @@ def active_backups_count(service)
 
   service.backups.each do |backup|
     next if backup.terminated # skip if backup terminated
-    next if backup.status.eql?('ready') || backup.status.eql?('error')
+    # States which do not affect creating of new backups or making new restores
+    next if ["ready", "error", "deleting_template", "deleted"].include?(backup.status)
 
     backups_in_processing.push(backup)
   end
