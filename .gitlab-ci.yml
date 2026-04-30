@@ -1,0 +1,34 @@
+stages:
+  - code_audit
+
+variables:
+  GITLEAKS_IMAGE: "ghcr.io/gitleaks/gitleaks:latest"
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "dev"
+    - if: $CI_COMMIT_BRANCH == "dev"
+
+gitleaks:
+  tags:
+    - testing
+  stage: code_audit
+  before_script:
+    - mkdir -p output
+  script:
+    - >
+      podman run --rm
+      -v "$(pwd):/repo:Z" -w /repo
+      "$GITLEAKS_IMAGE" git /repo
+      --redact
+      --no-banner
+      --report-format json
+      --report-path /repo/output/report.json
+  after_script:
+    - cp output/report.json .
+  artifacts:
+    when: always
+    paths: [report.json]
+    reports:
+      secret_detection: report.json
+    expire_in: 1 week
