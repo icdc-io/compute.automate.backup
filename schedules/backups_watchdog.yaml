@@ -1,0 +1,45 @@
+---
+- MiqSchedule:
+    name: backups_watchdog 
+    description: Backups watchdog + doctor
+    sched_action:
+      :method: automation_request
+    filter:
+      :uri_parts:
+        :namespace: SYSTEM/PROCESS
+        :instance: Request
+        :message: create
+      :ui:
+        :ui_attrs:
+        - - namespace
+          - System
+        - - class
+          - Methods
+        - - instance
+          - BackupsWatchdog
+        :ui_object:
+          :target_class: 
+          :target_id: ''
+      :parameters:
+        :request: Call_Instance
+        :instance_name: Request
+        :object_message: create
+        namespace: System
+        class: Methods
+        instance: BackupsWatchdog
+    resource_type: AutomationRequest
+    run_at:
+      :tz: UTC
+      :start_time: 2023-07-20 00:00:00.000000000 Z
+      :interval:
+        :unit: hourly
+        :value: '1'
+    enabled: true
+    userid: admin
+    prod_default: 
+    miq_search_id: 
+    adhoc: 
+    file_depot_id: 
+    schedulable_id: 
+    schedulable_type: 
+    resource_id: 
