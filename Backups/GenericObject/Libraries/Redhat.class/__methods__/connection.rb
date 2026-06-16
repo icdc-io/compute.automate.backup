@@ -2,8 +2,6 @@
 # Description: connection lib that is used for backups
 #
 
-require 'ovirtsdk4'
-
 def establish_connection(vm_or_template)
   ems ||= vm_or_template&.ext_management_system
   ems ||= vm_or_template&.service&.service_template&.service_resources&.first&.resource&.source&.ext_management_system

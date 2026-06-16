@@ -1,5 +1,3 @@
-require 'date'
-
 def create_backup(vm, backups)
   if backups.length >= vm.tags(:backup_count).first.to_i
     slice_from = vm.tags(:backup_count).first.to_i - 1

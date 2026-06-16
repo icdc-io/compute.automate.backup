@@ -1,5 +1,3 @@
-require 'ovirtsdk4'
-
 def create_template(connection, snapshot, backup)
   vm = $evm.vmdb(:Vm).find_by!(name: JSON.parse(backup.configuration)['vm_name'])
 
