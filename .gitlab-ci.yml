@@ -13,6 +13,8 @@ gitleaks:
   tags:
     - testing
   stage: code_audit
+  variables:
+    GIT_DEPTH: "0"
   before_script:
     - mkdir -p output
   script:
@@ -22,6 +24,7 @@ gitleaks:
       "$GITLEAKS_IMAGE" git /repo
       --redact
       --no-banner
+      --config /repo/.gitleaks.toml
       --report-format json
       --report-path /repo/output/report.json
   after_script:
