@@ -2,8 +2,6 @@
 # Description: vm networks, dns lib
 #
 
-require 'coredns'
-
 def remove_dns_records(service, vm)
   @service = service
 
