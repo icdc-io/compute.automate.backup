@@ -4,6 +4,11 @@ end
 
 def disks_map(vm_uid)
   vm = $evm.vmdb(:VmOrTemplate).find_by(uid_ems: vm_uid)
+  unless vm
+    $evm.root['ae_result']         = 'retry'
+	  $evm.root['ae_retry_interval'] = '1.minute'
+    exit MIQ_OK
+  end
   connection = get_api_connection(vm)
   $evm.log(:info, "[Disks configuration] collecting vm #{vm_uid} disk map")
   da_list = connection.vms_service.vm_service(vm.uid_ems).disk_attachments_service.list

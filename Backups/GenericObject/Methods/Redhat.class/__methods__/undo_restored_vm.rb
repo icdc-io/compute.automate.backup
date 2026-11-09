@@ -1,5 +1,3 @@
-require 'ovirtsdk4'
-
 module Backups
   module Automate
     module GenericObject
